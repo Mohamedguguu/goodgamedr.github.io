@@ -5,143 +5,86 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>⚙️ Ultimate Webhook Spammer ⚙️</title>
   <style>
-    :root {
-      --bg1: #0f0f0f;
-      --bg2: #1a1a40;
-      --accent: #00ffff;
-      --accent2: #6f42c1;
-      --text: #fff;
-      --card: rgba(0,0,0,0.7);
-      --valid: #28a745;
-      --invalid: #dc3545;
-    }
-    [data-theme="light"] {
-      --bg1: #f4f4f8;
-      --bg2: #dcdcf0;
-      --text: #111;
-      --card: rgba(255,255,255,0.8);
-      --accent: #0077cc;
-      --accent2: #6f42c1;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin:0; padding:0; font-family:'Segoe UI',sans-serif;
-      color: var(--text);
-      background: linear-gradient(145deg,var(--bg1),var(--bg2));
-      background-size:400% 400%; animation:bgmove 60s ease infinite;
-      transition:background .5s,color .5s;
-    }
+    :root { --bg1:#0f0f0f;--bg2:#1a1a40;--accent:#00ffff;--accent2:#6f42c1;--text:#fff;--card:rgba(0,0,0,0.7);--valid:#28a745;--invalid:#dc3545;}
+    [data-theme="light"] { --bg1:#f4f4f8;--bg2:#dcdcf0;--text:#111;--card:rgba(255,255,255,0.8);--accent:#0077cc;--accent2:#6f42c1; }
+    *{box-sizing:border-box;}
+    body{margin:0;padding:0;font-family:'Segoe UI',sans-serif;color:var(--text);background:linear-gradient(145deg,var(--bg1),var(--bg2));background-size:400% 400%;animation:bgmove 60s ease infinite;transition:background .5s,color .5s;}
     @keyframes bgmove{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
-    h1{ text-align:center; margin:20px 0; font-size:2.5rem;
-      background:linear-gradient(90deg,var(--accent2),var(--accent));
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-      animation:underline 2s infinite; }
+    h1{text-align:center;margin:20px 0;font-size:2.5rem;background:linear-gradient(90deg,var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:underline 2s infinite;}
     @keyframes underline{0%,100%{text-decoration:underline;}50%{text-decoration:none;}}
-    .container{max-width:900px;margin:auto;background:var(--card);padding:20px;
-      border-radius:12px;box-shadow:0 0 20px var(--accent2);backdrop-filter:blur(5px);}
+    .container{max-width:900px;margin:auto;background:var(--card);padding:20px;border-radius:12px;box-shadow:0 0 20px var(--accent2);backdrop-filter:blur(5px);}
     label{display:block;margin-top:15px;font-weight:600;}
-    input, textarea, select{width:100%;padding:10px;margin-top:5px;
-      border:2px solid transparent;border-radius:6px;
-      background:rgba(50,50,70,0.5);color:var(--text);font-size:1rem;
-      transition:transform .2s,box-shadow .3s,border-color .3s;
-    }
-    input:focus,textarea:focus,select:focus{transform:scale(1.02);
-      box-shadow:0 0 8px var(--accent2);outline:none;
-    }
-    .settings, .storage, .embed-settings{margin-top:20px;padding:15px;
-      background:rgba(20,20,30,0.7);border-radius:8px;}
-    .settings h2, .embed-settings h2, .storage h2{margin:0 0 10px;font-size:1.2rem;}
+    input,textarea,select{width:100%;padding:10px;margin-top:5px;border:2px solid transparent;border-radius:6px;background:rgba(50,50,70,0.5);color:var(--text);font-size:1rem;transition:transform .2s,box-shadow .3s,border-color .3s;}
+    input:focus,textarea:focus,select:focus{transform:scale(1.02);box-shadow:0 0 8px var(--accent2);outline:none;}
+    .settings,.storage,.embed-settings{margin-top:20px;padding:15px;background:rgba(20,20,30,0.7);border-radius:8px;}
+    .settings h2,.embed-settings h2,.storage h2{margin:0 0 10px;font-size:1.2rem;}
     .slider-container{display:flex;align-items:center;gap:10px;}
     .slider-label{flex:1;}
     .slider{flex:3;}
     .buttons{margin-top:20px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
-    button{padding:10px 20px;font-size:1rem;border:none;border-radius:6px;cursor:pointer;
-      transition:transform .2s,box-shadow .3s;
-    }
-    .start{background:#28a745;color:#000;}
-    .stop{background:#dc3545;}
-    .check{background:#007bff;}
-    .load{background:#ffc107;color:#000;}
-    .clear-console, .clear-preview{background:#343a40;}
-    .join{background:var(--accent2);}
-    .save{background:#17a2b8;}
-    button:hover{transform:scale(1.05);box-shadow:0 0 8px var(--accent2);}
-    button:active{transform:scale(0.95);}
-    #preview{margin-top:20px;padding:15px;background:rgba(30,30,40,0.7);
-      border-radius:6px;font-family:monospace;white-space:pre-wrap;
-      max-height:200px;overflow-y:auto;
-    }
-    #console{margin-top:20px;background:#121212;color:#00ff88;padding:10px;
-      border-radius:6px;height:240px;overflow-y:auto;font-family:monospace;
-    }
-    .credits{text-align:center;margin-top:20px;font-size:0.9rem;}
-    .credits a{color:var(--accent2);text-decoration:none;}
-    .theme-toggle{position:fixed;top:20px;right:20px;background:none;
-      border:2px solid var(--accent2);border-radius:50%;width:40px;height:40px;
-      display:flex;align-items:center;justify-content:center;cursor:pointer;
-      transition:transform .2s;
-    }
-    .theme-toggle:hover{transform:rotate(20deg);}
-    .storage-item{display:flex;justify-content:space-between;padding:6px 0;
-      border-bottom:1px solid #444;
-    }
-    .notice{transition:opacity .5s;opacity:0;position:fixed;
-      bottom:20px;left:50%;transform:translateX(-50%);
-      background:var(--accent2);color:var(--text);padding:10px 20px;
-      border-radius:6px;box-shadow:0 0 10px var(--accent);
-    }
+    button{padding:10px 20px;font-size:1rem;border:none;border-radius:6px;cursor:pointer;transition:transform .2s,box-shadow .3s;}
+    .start{background:#28a745;color:#000;} .stop{background:#dc3545;} .check{background:#007bff;} .load{background:#ffc107;color:#000;} .clear-console,.clear-preview{background:#343a40;} .join{background:var(--accent2);} .save{background:#17a2b8;} .speed-preset{background:#6c757d;color:#fff;}
+    button:hover{transform:scale(1.05);box-shadow:0 0 8px var(--accent2);} button:active{transform:scale(0.95);}
+    #preview{margin-top:20px;padding:15px;background:rgba(30,30,40,0.7);border-radius:6px;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow-y:auto;}
+    #console{margin-top:20px;background:#121212;color:#00ff88;padding:10px;border-radius:6px;height:240px;overflow-y:auto;font-family:monospace;}
+    .credits{text-align:center;margin-top:20px;font-size:0.9rem;} .credits a{color:var(--accent2);text-decoration:none;}
+    .theme-toggle{position:fixed;top:20px;right:20px;background:none;border:2px solid var(--accent2);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .2s;} .theme-toggle:hover{transform:rotate(20deg);}
+    .storage-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #444;}
+    .notice{transition:opacity .5s;opacity:0;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--accent2);color:var(--text);padding:10px 20px;border-radius:6px;box-shadow:0 0 10px var(--accent);}
   </style>
 </head>
 <body data-theme="dark">
   <div class="theme-toggle" onclick="toggleTheme()">🌗</div>
   <h1>Ultimate Webhook Spammer</h1>
   <div class="container">
-    <label>Webhook URL</label>
-    <input id="webhookUrl" placeholder="https://discord.com/api/webhooks/..." />
-    <label>Name (Optional)</label>
-    <input id="webhookName" placeholder="Webhook Bot Name" />
-    <label>Avatar URL (Optional)</label>
-    <input id="avatarUrl" placeholder="https://..." />
-    <label>Message</label>
-    <textarea id="message" rows="3" placeholder="Type message..."></textarea>
+    <!-- Fields -->
+    <label>Webhook URL</label><input id="webhookUrl" placeholder="https://discord.com/api/webhooks/..." />
+    <label>Avatar URL</label><input id="avatarUrl" placeholder="https://..." />
+    <label>File Attachment URL</label><input id="fileUrl" placeholder="https://...png" />
+    <label>Name</label><input id="webhookName" placeholder="Bot Name (optional)" />
+    <label>Message</label><textarea id="message" rows="3"></textarea>
 
+    <!-- Embed -->
     <div class="embed-settings">
       <h2>Embed Settings</h2>
-      <label>Embed Title</label><input id="embedTitle" placeholder="Embed Title (optional)" />
-      <label>Embed Description</label><textarea id="embedDesc" rows="2" placeholder="Embed Description (optional)"></textarea>
-      <label>Embed Color (hex)</label><input id="embedColor" placeholder="#00ff00" />
-      <label>File Attachment URL</label><input id="fileUrl" placeholder="https://...png" />
+      <label>Title</label><input id="embedTitle" />
+      <label>Description</label><textarea id="embedDesc" rows="2"></textarea>
+      <label>Color (hex)</label><input id="embedColor" placeholder="#00ff00" />
     </div>
 
+    <!-- Options -->
     <div class="settings">
       <h2>Options</h2>
-      <label><input type="checkbox" id="useEmoji" checked/> Emojis</label>
-      <label><input type="checkbox" id="useNumber" checked/> Random Number</label>
-      <label><input type="checkbox" id="showTimestamp"/> Timestamp</label>
-      <div class="slider-container">
-        <div class="slider-label">Speed: <span id="speedValue">1000ms</span></div>
-        <input type="range" id="speed" class="slider" min="100" max="3000" step="100" value="1000"/>
-      </div>
-      <label>Emoji List (comma-separated)</label>
-      <input id="emojiList" value="🔥,💣,⚡,🚀,🎯" />
+      <label><input type="checkbox" id="useEmoji" checked/> Add Emojis</label>
+      <label><input type="checkbox" id="useNumber" checked/> Add Random Number</label>
+      <label><input type="checkbox" id="showTimestamp"/> Add Timestamp</label>
+      <div class="slider-container"><div class="slider-label">Speed: <span id="speedValue">1000ms</span></div><input type="range" id="speed" class="slider" min="100" max="3000" step="100" value="1000"/></div>
+      <label>Emoji List</label><input id="emojiList" value="🔥,💣,⚡,🚀,🎯" />
     </div>
 
+    <!-- Storage -->
     <div class="storage">
-      <h2>Stored Configs</h2>
-      <button class="save" onclick="saveConfig()">💾 Save</button>
-      <div id="storageList" class="storage-list"></div>
+      <h2>Stored Configs</h2><button class="save" onclick="saveConfig()">💾 Save</button>
+      <div id="storageList"></div>
     </div>
 
+    <!-- Actions -->
     <div class="buttons">
       <button class="start" onclick="startSpam()">▶ Start</button>
       <button class="stop" onclick="stopSpam()">⏹ Stop</button>
-      <button class="check" onclick="checkWebhook()">🔍 Check</button>
+      <button class="check" onclick="checkWebhook()">🔍 Validate</button>
       <button class="load" onclick="loadConfig()">🔄 Load</button>
       <button class="clear-console" onclick="clearConsole()">🗑️ Clear Log</button>
       <button class="clear-preview" onclick="clearPreview()">🗑️ Clear Preview</button>
+      <!-- Speed presets -->
+      <button class="speed-preset" onclick="changeSpeed(1000)">Normal</button>
+      <button class="speed-preset" onclick="changeSpeed(500)">Medium</button>
+      <button class="speed-preset" onclick="changeSpeed(300)">Fast</button>
+      <button class="speed-preset" onclick="changeSpeed(100)">Very Fast</button>
       <button class="join" onclick="joinServer()">💬 Join</button>
     </div>
 
+    <!-- Preview & Console -->
     <div id="preview">▶ Payload Preview...</div>
     <div id="console">▶ Console ready...</div>
     <div class="credits">Made by <a href="https://github.com/Mohamedguguu" target="_blank">Mohamedguguu</a></div>
@@ -149,95 +92,34 @@
   <div id="notice" class="notice"></div>
 
   <script>
-    // Theme toggle
-    function toggleTheme(){ const b=document.body; b.dataset.theme=b.dataset.theme==='dark'?'light':'dark'; }
+    // Theme
+    function toggleTheme(){const b=document.body;b.dataset.theme=b.dataset.theme==='dark'?'light':'dark';}
     // Notice
-    function showNotice(msg){ const n=document.getElementById('notice'); n.textContent=msg; n.style.opacity=1; setTimeout(()=>n.style.opacity=0,3000); }
+    function showNotice(msg){const n=document.getElementById('notice');n.textContent=msg;n.style.opacity=1;setTimeout(()=>n.style.opacity=0,3000);}
     // Debounce
-    function debounce(fn, delay){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), delay); }; }
-    // Config
-    const storageKey='webhookConfigs'; let intervalId=null, count=0;
+    function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);};}
+    const storageKey='webhookConfigs'; let intervalId=null,count=0;
+    // Validate URL inputs
+    ['webhookUrl','avatarUrl','fileUrl'].forEach(id=>{const inp=document.getElementById(id);inp.addEventListener('input',debounce(async()=>{const v=inp.value.trim();if(!v){inp.style.borderColor='transparent';return;}try{new URL(v);}catch{return inp.style.borderColor='var(--invalid)';}try{const res=await fetch(v,{method:'GET'});inp.style.borderColor=res.ok?'var(--valid)':'var(--invalid)';showNotice(res.ok?'Valid':'Invalid');}catch{inp.style.borderColor='var(--invalid)';showNotice('Invalid');}} ,500));});
+    function log(m){const c=document.getElementById('console');c.textContent+='\n▶ '+m;c.scrollTop=c.scrollHeight;showNotice(m);}    
+    function clearConsole(){document.getElementById('console').textContent='▶ Console cleared';}
+    function preview(msg){document.getElementById('preview').textContent=msg;}
+    function clearPreview(){document.getElementById('preview').textContent='▶ Payload Preview...';}
+    document.getElementById('speed').addEventListener('input',e=>document.getElementById('speedValue').textContent=e.target.value+'ms');
 
-    // Validate webhook on input change
-    const webhookInput=document.getElementById('webhookUrl');
-    webhookInput.addEventListener('input', debounce(async ()=>{
-      const url=webhookInput.value.trim();
-      if(!url) { webhookInput.style.borderColor='transparent'; return; }
-      try{ const res=await fetch(url,{method:'GET'});
-        webhookInput.style.borderColor=res.ok? 'var(--valid)' : 'var(--invalid)';
-        showNotice(res.ok? 'Valid webhook' : 'Invalid webhook');
-      }catch{ webhookInput.style.borderColor='var(--invalid)'; showNotice('Invalid webhook'); }
-    }, 500));
-
-    // Utility
-    function log(msg){ const c=document.getElementById('console'); c.textContent+='\n▶ '+msg; c.scrollTop=c.scrollHeight; showNotice(msg); }
-    function clearConsole(){ document.getElementById('console').textContent='▶ Console cleared'; }
-    function preview(msg){ document.getElementById('preview').textContent=msg; }
-    function clearPreview(){ document.getElementById('preview').textContent='▶ Payload Preview...'; }
-    document.getElementById('speed').addEventListener('input', e=>{
-      document.getElementById('speedValue').textContent=e.target.value+'ms';
-    });
-
-    function getConfig(){ return {
-      url:document.getElementById('webhookUrl').value.trim(),
-      name:document.getElementById('webhookName').value.trim(),
-      avatar:document.getElementById('avatarUrl').value.trim(),
-      base:document.getElementById('message').value,
-      emojis:document.getElementById('useEmoji').checked,
-      numbers:document.getElementById('useNumber').checked,
-      ts:document.getElementById('showTimestamp').checked,
-      speed:+document.getElementById('speed').value,
-      list:document.getElementById('emojiList').value.split(',').map(s=>s.trim()).filter(Boolean),
-      embedTitle:document.getElementById('embedTitle').value,
-      embedDesc:document.getElementById('embedDesc').value,
-      embedColor:document.getElementById('embedColor').value,
-      fileUrl:document.getElementById('fileUrl').value
-    }; }
-
-    function buildPayload(cfg){ const parts=[];
-      if(cfg.emojis && cfg.list.length) parts.push(cfg.list[Math.floor(Math.random()*cfg.list.length)]);
-      if(cfg.numbers) parts.push(Math.floor(Math.random()*90000+10000));
-      if(cfg.ts) parts.push(new Date().toLocaleTimeString());
-      const content=cfg.base + (parts.length? ' '+parts.join(' '): '');
-      const payload={ content };
-      if(cfg.name) payload.username=cfg.name;
-      if(cfg.avatar) payload.avatar_url=cfg.avatar;
-      if(cfg.embedTitle||cfg.embedDesc) payload.embeds=[{ title:cfg.embedTitle, description:cfg.embedDesc, color: parseInt(cfg.embedColor.replace('#',''),16)||undefined }];
-      if(cfg.fileUrl) payload.file=cfg.fileUrl;
-      preview(JSON.stringify(payload, null, 2));
-      return payload;
-    }
-
-    async function sendMessage(){ const cfg=getConfig();
-      if(!cfg.url||!cfg.base){ log('Missing URL or message'); stopSpam(); return; }
-      try{
-        const payload=buildPayload(cfg);
-        const res=await fetch(cfg.url, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
-        if(res.status===204||res.ok){ count++; log(`Sent #${count}`); }
-        else if(res.status===404||res.status===410){ log('Webhook deleted or not found'); stopSpam(); }
-        else{ log(`Error ${res.status}`); }
-      } catch(e){ log('Network error'); stopSpam(); }
-    }
-
-    function startSpam(){ if(intervalId) return; count=0; clearConsole(); log('Spamming started'); const s=getConfig().speed; sendMessage(); intervalId=setInterval(sendMessage, s); }
-    function stopSpam(){ clearInterval(intervalId); intervalId=null; log('Spamming stopped'); }
-
-    async function checkWebhook(){ const url=document.getElementById('webhookUrl').value.trim();
-      if(!url){ showNotice('No URL provided'); return; }
-      try{ const res=await fetch(url, { method:'GET' });
-        showNotice(res.ok? 'Webhook valid':`Invalid: ${res.status}`);
-      } catch{ showNotice('Network error'); }
-    }
-
-    function joinServer(){ window.open('https://discord.gg/ncGaCWKns2','_blank'); }
-
-    function loadConfig(){ loadStorage(); showNotice('Configs refreshed'); }
-    function loadStorage(){ const list=JSON.parse(localStorage.getItem(storageKey)||'[]'); const ul=document.getElementById('storageList'); ul.innerHTML=''; list.forEach((c,i)=>{ const d=document.createElement('div'); d.className='storage-item'; d.innerHTML=`<span>${c.name||c.url}</span><div><button onclick="applyStorage(${i})">Load</button><button onclick="deleteStorage(${i})">Del</button></div>`; ul.appendChild(d); }); }
-    function saveConfig(){ const c=getConfig(); if(!c.url){ showNotice('No URL'); return; } const l=JSON.parse(localStorage.getItem(storageKey)||'[]'); l.push(c); localStorage.setItem(storageKey, JSON.stringify(l)); loadStorage(); showNotice('Config saved'); }
-    function applyStorage(i){ const l=JSON.parse(localStorage.getItem(storageKey)||'[]')[i]; ['webhookUrl','webhookName','avatarUrl','message','embedTitle','embedDesc','embedColor','fileUrl'].forEach(id=>document.getElementById(id).value=l[id]||''); document.getElementById('useEmoji').checked=l.emojis; document.getElementById('useNumber').checked=l.numbers; document.getElementById('showTimestamp').checked=l.ts; document.getElementById('speed').value=l.speed; document.getElementById('speedValue').textContent=l.speed+'ms'; document.getElementById('emojiList').value=l.list.join(','); showNotice('Config loaded'); }
-    function deleteStorage(i){ const l=JSON.parse(localStorage.getItem(storageKey)||'[]'); l.splice(i,1); localStorage.setItem(storageKey,JSON.stringify(l)); loadStorage(); showNotice('Config deleted'); }
-
-    // Init
+    function getConfig(){return{url:document.getElementById('webhookUrl').value.trim(),avatar:document.getElementById('avatarUrl').value.trim(),fileUrl:document.getElementById('fileUrl').value.trim(),name:document.getElementById('webhookName').value.trim(),base:document.getElementById('message').value,emojis:document.getElementById('useEmoji').checked,numbers:document.getElementById('useNumber').checked,ts:document.getElementById('showTimestamp').checked,speed:+document.getElementById('speed').value,list:document.getElementById('emojiList').value.split(',').map(s=>s.trim()).filter(Boolean),embedTitle:document.getElementById('embedTitle').value,embedDesc:document.getElementById('embedDesc').value,embedColor:document.getElementById('embedColor').value};}
+    function buildPayload(cfg){const p=[];if(cfg.emojis) p.push(cfg.list[Math.floor(Math.random()*cfg.list.length)]); if(cfg.numbers) p.push(Math.floor(Math.random()*90000+10000)); if(cfg.ts) p.push(new Date().toLocaleTimeString()); const content=cfg.base+(p.length?' '+p.join(' '):''); const payload={content}; if(cfg.name)payload.username=cfg.name; if(cfg.avatar)payload.avatar_url=cfg.avatar; if(cfg.embedTitle||cfg.embedDesc)payload.embeds=[{title:cfg.embedTitle,description:cfg.embedDesc,color:parseInt(cfg.embedColor.replace('#',''),16)||undefined}]; if(cfg.fileUrl)payload.file=cfg.fileUrl; preview(JSON.stringify(payload,null,2)); return payload;}
+    async function sendMessage(){const cfg=getConfig(); if(!cfg.url||!cfg.base){log('Missing URL or message');stopSpam();return;} try{const payload=buildPayload(cfg); const res=await fetch(cfg.url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); if(res.status===204||res.ok){count++;log(`Sent #${count}`);} else if(res.status===429){log('Rate limited (429), retrying in 5s');stopSpam();setTimeout(startSpam,5000);} else if(res.status===404||res.status===410){log('Webhook gone');stopSpam();} else{log(`Error ${res.status}`);} }catch(e){log('Network error');stopSpam(); }}
+    function startSpam(){if(intervalId)return;count=0;clearConsole();log('Spamming started');const s=getConfig().speed;sendMessage();intervalId=setInterval(sendMessage,s);}    
+    function stopSpam(){clearInterval(intervalId);intervalId=null;log('Spamming stopped');}
+    function changeSpeed(ms){const slider=document.getElementById('speed');slider.value=ms;document.getElementById('speedValue').textContent=ms+'ms'; if(intervalId){stopSpam();startSpam();} showNotice(`Speed set to ${ms}ms`);}
+    async function checkWebhook(){const url=document.getElementById('webhookUrl').value.trim(); if(!url){showNotice('No URL');return;} try{const res=await fetch(url,{method:'GET'});showNotice(res.ok?'Valid webhook':`Invalid: ${res.status}`);}catch{showNotice('Network error');}}
+    function joinServer(){window.open('https://discord.gg/ncGaCWKns2','_blank');}
+    function loadConfig(){loadStorage();showNotice('Configs refreshed');}
+    function loadStorage(){const list=JSON.parse(localStorage.getItem(storageKey)||'[]');const ul=document.getElementById('storageList');ul.innerHTML='';list.forEach((c,i)=>{const d=document.createElement('div');d.className='storage-item';d.innerHTML=`<span>${c.name||c.url}</span><div><button onclick="applyStorage(${i})">Load</button><button onclick="deleteStorage(${i})">Del</button></div>`;ul.appendChild(d);});}
+    function saveConfig(){const c=getConfig();if(!c.url){showNotice('No URL');return;}const l=JSON.parse(localStorage.getItem(storageKey)||'[]');l.push(c);localStorage.setItem(storageKey,JSON.stringify(l));loadStorage();showNotice('Config saved');}
+    function applyStorage(i){const l=JSON.parse(localStorage.getItem(storageKey)||'[]')[i];['webhookUrl','avatarUrl','fileUrl','webhookName','message','embedTitle','embedDesc','embedColor'].forEach(id=>document.getElementById(id).value=l[id]||'');document.getElementById('useEmoji').checked=l.emojis;document.getElementById('useNumber').checked=l.numbers;document.getElementById('showTimestamp').checked=l.ts;document.getElementById('speed').value=l.speed;document.getElementById('speedValue').textContent=l.speed+'ms';document.getElementById('emojiList').value=l.list.join(',');showNotice('Config loaded');}
+    function deleteStorage(i){const l=JSON.parse(localStorage.getItem(storageKey)||'[]');l.splice(i,1);localStorage.setItem(storageKey,JSON.stringify(l));loadStorage();showNotice('Config deleted');}
     loadStorage();
   </script>
 </body>
