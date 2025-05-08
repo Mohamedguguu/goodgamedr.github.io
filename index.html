@@ -3,226 +3,212 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>💣 Webhook Nuker Dashboard</title>
+  <title>⚙️ Ultimate Webhook Spammer ⚙️</title>
   <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
+    body { margin: 0; font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(145deg, #0f0f0f, #1a1a40);
-      color: #ffffff;
-      padding: 30px;
-      animation: bgmove 20s infinite alternate;
+      background-size: 400% 400%; animation: bgmove 60s ease infinite;
+      padding: 20px; color: #fff;
     }
-
-    @keyframes bgmove {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 100% 50%; }
+    @keyframes bgmove { 0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%} }
+    h1 { text-align:center; color:#ff1493; text-shadow:0 0 12px #ff1493;
+      margin-bottom:10px; opacity:0; animation:fadeIn 1s forwards;
     }
-
-    h1 {
-      text-align: center;
-      font-size: 38px;
-      margin-bottom: 20px;
-      color: #ff00cc;
-      text-shadow: 0 0 12px #ff00cc;
+    @keyframes fadeIn { to{opacity:1;} }
+    .container { max-width:800px; margin:0 auto; background:rgba(0,0,0,0.6);
+      padding:20px; border-radius:8px; box-shadow:0 0 20px #00ffff;
+      animation:slideIn 0.8s ease;
     }
-
-    label {
-      font-weight: bold;
-      display: block;
-      margin-top: 12px;
+    @keyframes slideIn { from{transform:translateY(-20px);opacity:0;} to{transform:translateY(0);opacity:1;} }
+    label { display:block; margin-top:12px; font-weight:bold; opacity:0;
+      animation:fadeIn 1s forwards; animation-delay:0.5s;
     }
-
-    input, textarea {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border-radius: 6px;
-      border: none;
-      background-color: #2a2a3d;
-      color: #fff;
-      font-size: 14px;
+    input, textarea, select { width:100%; padding:10px; margin-top:6px;
+      border-radius:6px; border:none; background:#2a2a3d; color:#fff;
+      font-size:14px; transition:box-shadow .3s, transform .3s;
     }
-
-    input:focus, textarea:focus {
-      outline: none;
-      box-shadow: 0 0 8px #00ffff;
+    input:focus, textarea:focus, select:focus { box-shadow:0 0 12px #00ffff;
+      outline:none; transform:scale(1.02);
     }
-
-    button {
-      padding: 10px 16px;
-      margin: 10px 8px 0 0;
-      font-size: 15px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: 0.3s;
-      box-shadow: 0 0 8px #00ffff;
-      color: white;
+    .settings, .storage { margin-top:20px; background:#1e1e2f; padding:12px;
+      border-radius:6px; animation:fadeIn 1s forwards; animation-delay:0.7s;
     }
-
-    .start { background: #28a745; }
-    .stop { background: #dc3545; }
-    .fast { background: #007bff; }
-    .ultrafast { background: #ffc107; color: black; }
-    .delete { background: #6f42c1; }
-    .join { background: #5865f2; }
-
-    button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 12px #ffffff;
+    .settings h2, .storage h2 { margin:0 0 10px; font-size:18px; }
+    .slider-label { display:flex; justify-content:space-between; }
+    .slider { width:100%; }
+    .buttons { margin-top:15px; text-align:center; }
+    button { padding:10px 20px; margin:6px 8px; border:none;
+      border-radius:6px; cursor:pointer; font-size:14px;
+      transition:transform .2s, box-shadow .2s, background .3s;
+      position:relative; overflow:hidden;
     }
-
-    #console {
-      background: #121212;
-      color: #00ff88;
-      font-family: monospace;
-      padding: 10px;
-      margin-top: 20px;
-      height: 150px;
-      overflow-y: auto;
-      border-radius: 5px;
-      border: 1px solid #444;
+    button:before { content:''; position:absolute; top:0; left:-100%;
+      width:100%; height:100%; background:rgba(255,255,255,0.1);
+      transform:skewX(-20deg); transition:left .5s;
     }
-
-    .credits {
-      margin-top: 30px;
-      text-align: center;
-      font-size: 14px;
-      color: #999;
+    button:hover:before { left:200%; }
+    button:hover { transform:scale(1.05); box-shadow:0 0 15px #00ffff; }
+    button.start { background:#28a745; color:#000; }
+    button.stop { background:#dc3545; }
+    button.save { background:#17a2b8; }
+    button.load { background:#ffc107; color:#000; }
+    button.delete { background:#6f42c1; }
+    button.clear { background:#343a40; }
+    button.join { background:#5865f2; }
+    #console { background:#121212; color:#00ff88; padding:10px; margin-top:20px;
+      height:220px; overflow-y:auto; border-radius:5px; border:1px solid #444;
+      font-family:monospace; animation:fadeIn 1s forwards; animation-delay:0.9s;
     }
-
-    .credits a {
-      color: #00ffff;
-      text-decoration: none;
+    .storage-list { max-height:100px; overflow-y:auto; margin-top:6px; }
+    .storage-item { display:flex; justify-content:space-between; padding:4px;
+      border-bottom:1px solid #444;
     }
-
-    .credits a:hover {
-      text-decoration: underline;
-    }
+    .credits { text-align:center; margin-top:20px; font-size:12px; color:#888; }
+    .credits a { color:#00ffff; text-decoration:none; }
   </style>
 </head>
 <body>
-  <h1>💣 Webhook Nuker Dashboard</h1>
+  <h1>⚙️ Ultimate Webhook Spammer ⚙️</h1>
+  <div class="container">
+    <label>Webhook URL</label>
+    <input id="webhookUrl" placeholder="https://discord.com/api/webhooks/..." />
+    <label>Webhook Name</label>
+    <input id="webhookName" placeholder="Bot Name (optional)" />
+    <label>Avatar URL</label>
+    <input id="avatarUrl" placeholder="Avatar URL (optional)" />
+    <label>Message Content</label>
+    <textarea id="message" rows="3" placeholder="Type your message..."></textarea>
 
-  <label>Webhook URL</label>
-  <input type="text" id="webhookUrl" placeholder="https://discord.com/api/webhooks/...">
+    <div class="settings">
+      <h2>Settings</h2>
+      <label><input type="checkbox" id="useEmoji" checked /> Include Emojis</label>
+      <label><input type="checkbox" id="useNumber" checked /> Include Random Numbers</label>
+      <label><input type="checkbox" id="showTimestamp" /> Include Timestamp</label>
+      <div>
+        <label class="slider-label">Speed: <span id="speedValue">1000ms</span></label>
+        <input type="range" id="speed" class="slider" min="100" max="5000" step="100" value="1000" />
+      </div>
+      <label>Emoji List (comma-separated)</label>
+      <input id="emojiList" value="🔥,💣,⚡,🚀,🎯" />
+    </div>
 
-  <label>Webhook Name</label>
-  <input type="text" id="webhookName" placeholder="Webhook Bot Name">
+    <div class="storage">
+      <h2>Stored Webhooks</h2>
+      <button class="save" onclick="saveCurrent()">💾 Save Current</button>
+      <div class="storage-list" id="storageList"></div>
+    </div>
 
-  <label>Avatar URL</label>
-  <input type="text" id="avatarUrl" placeholder="Avatar Image URL">
+    <div class="buttons">
+      <button class="start" onclick="startSpam()">▶ Start</button>
+      <button class="stop" onclick="stopSpam()">⏹ Stop</button>
+      <button class="load" onclick="loadSelected()">🔄 Load Selected</button>
+      <button class="clear" onclick="clearConsole()">🗑️ Clear Console</button>
+      <button class="join" onclick="joinServer()">💬 Join Discord</button>
+    </div>
 
-  <label>Message</label>
-  <textarea id="message" rows="4" placeholder="Enter message here..."></textarea>
-
-  <div>
-    <button class="start" onclick="startSending()">▶ Start</button>
-    <button class="stop" onclick="stopSending()">⏹ Stop</button>
-    <button class="fast" onclick="setSpeed(300)">⚡ Fast</button>
-    <button class="ultrafast" onclick="setSpeed(100)">🚀 Ultra Fast</button>
-    <button class="delete" onclick="deleteWebhook()">🧹 Delete Webhook</button>
-    <button class="join" onclick="joinDiscord()">💬 Join My Discord</button>
-  </div>
-
-  <div id="console">
-    ▶ Console ready...
-  </div>
-
-  <div class="credits">
-    Made by <a href="https://github.com/Mohamedguguu/goodgamedr.github.io" target="_blank">YourGitHub</a> |
-    Join us on <a href="https://discord.gg/ncGaCWKns2" target="_blank">Discord</a>
+    <div id="console">▶ Ready...</div>
+    <div class="credits">Created by <a href="https://github.com/Mohamedguguu">Mohamedguguu</a></div>
   </div>
 
   <script>
-    let intervalId = null;
-    let spamSpeed = 1000;
+    let intervalId = null, count = 0;
+    const storageKey = 'webhookConfigs';
 
-    function logConsole(message) {
-      const consoleBox = document.getElementById('console');
-      consoleBox.innerHTML += `\n> ${message}`;
-      consoleBox.scrollTop = consoleBox.scrollHeight;
+    function log(msg) {
+      const c = document.getElementById('console');
+      const line = document.createElement('div');
+      line.textContent = `▶ ${msg}`;
+      line.style.opacity = 0;
+      c.appendChild(line);
+      setTimeout(() => { line.style.transition = 'opacity 0.5s'; line.style.opacity = 1; }, 50);
+      c.scrollTop = c.scrollHeight;
     }
+    function clearConsole() { document.getElementById('console').innerHTML = '▶ Cleared console'; }
 
-    function getRandomEmoji() {
-      const emojis = ['🔥', '💣', '😈', '👾', '🚀', '💥', '🎯'];
-      return emojis[Math.floor(Math.random() * emojis.length)];
-    }
+    document.getElementById('speed').addEventListener('input', e => {
+      const v = e.target.value;
+      document.getElementById('speedValue').innerText = v + 'ms';
+    });
 
-    function getRandomSuffix() {
-      return `${getRandomEmoji()} ${Math.floor(10000 + Math.random() * 99999)}`;
-    }
-
-    function sendMessage() {
-      const url = document.getElementById('webhookUrl').value;
-      const name = document.getElementById('webhookName').value;
-      const avatar = document.getElementById('avatarUrl').value;
-      const base = document.getElementById('message').value;
-
-      if (!url || !base) {
-        logConsole("❌ Webhook URL or message is missing!");
-        return;
-      }
-
-      const payload = {
-        content: `${base} ${getRandomSuffix()}`,
-        username: name || undefined,
-        avatar_url: avatar || undefined
+    function isValidUrl(str) { try { new URL(str); return true; } catch { return false; } }
+    function getConfig() {
+      return {
+        url: document.getElementById('webhookUrl').value.trim(),
+        name: document.getElementById('webhookName').value.trim() || undefined,
+        avatar: document.getElementById('avatarUrl').value.trim() || undefined,
+        base: document.getElementById('message').value,
+        emojis: document.getElementById('useEmoji').checked,
+        numbers: document.getElementById('useNumber').checked,
+        ts: document.getElementById('showTimestamp').checked,
+        speed: parseInt(document.getElementById('speed').value),
+        list: document.getElementById('emojiList').value.split(',').map(s=>s.trim()).filter(Boolean)
       };
+    }
+    function randomSuffix(cfg) {
+      const parts = [];
+      if (cfg.emojis && cfg.list.length) parts.push(cfg.list[Math.floor(Math.random()*cfg.list.length)]);
+      if (cfg.numbers) parts.push(Math.floor(10000+Math.random()*90000));
+      if (cfg.ts) parts.push(new Date().toLocaleTimeString());
+      return parts.join(' ');
+    }
+    async function sendMessage() {
+      const cfg = getConfig();
+      if (!cfg.url||!cfg.base) { log('❌ Missing URL or message.'); stopSpam(); return; }
+      if (!isValidUrl(cfg.url)) { log('❌ Invalid webhook URL.'); stopSpam(); return; }
+      log(`Sending #${count+1}`);
+      try {
+        const res = await fetch(cfg.url, { method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({content:`${cfg.base} ${randomSuffix(cfg)}`, username:cfg.name, avatar_url:cfg.avatar}) });
+        if (res.ok) { count++; log(`✅ Sent #${count}`); }
+        else { log('⚠️ Rate limit or error'); }
+      } catch(e) { log('❌ '+e); }
+    }
+    function startSpam() {
+      if (intervalId) return;
+      count=0; clearConsole(); log('🟢 Spamming started');
+      const speed=getConfig().speed; intervalId=setInterval(sendMessage,speed);
+    }
+    function stopSpam() { clearInterval(intervalId); intervalId=null; log('🔴 Spamming stopped'); }
+    function joinServer() { window.open('https://discord.gg/ncGaCWKns2','_blank'); }
 
-      fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      }).then(res => {
-        if (res.ok) logConsole("✅ Message sent.");
-        else logConsole("⚠️ Failed to send message.");
-      }).catch(err => {
-        logConsole("❌ Error: " + err);
+    // Storage Handlers
+    function loadStorage() {
+      const list = JSON.parse(localStorage.getItem(storageKey)||'[]');
+      const container = document.getElementById('storageList'); container.innerHTML='';
+      list.forEach((cfg,i)=>{
+        const div = document.createElement('div'); div.className='storage-item';
+        div.innerHTML=`<span>${cfg.name||cfg.url}</span>
+          <div>
+            <button onclick="applyConfig(${i})">Load</button>
+            <button onclick="deleteConfig(${i})">Del</button>
+          </div>`;
+        container.appendChild(div);
       });
     }
-
-    function startSending() {
-      if (intervalId !== null) return;
-      logConsole("▶ Starting spam...");
-      sendMessage();
-      intervalId = setInterval(sendMessage, spamSpeed);
+    function saveCurrent() {
+      const cfg=getConfig(); if(!cfg.url) { log('❌ Cannot save: URL missing'); return; }
+      const list=JSON.parse(localStorage.getItem(storageKey)||'[]'); list.push(cfg);
+      localStorage.setItem(storageKey, JSON.stringify(list)); loadStorage(); log('💾 Saved current config');
     }
-
-    function stopSending() {
-      clearInterval(intervalId);
-      intervalId = null;
-      logConsole("⏹ Stopped spam.");
+    function applyConfig(i) {
+      const list=JSON.parse(localStorage.getItem(storageKey)||'[]'); const cfg=list[i];
+      Object.assign(document.getElementById('webhookUrl'), {value:cfg.url});
+      document.getElementById('webhookName').value=cfg.name||'';
+      document.getElementById('avatarUrl').value=cfg.avatar||'';
+      document.getElementById('message').value=cfg.base||'';
+      document.getElementById('useEmoji').checked=cfg.emojis;
+      document.getElementById('useNumber').checked=cfg.numbers;
+      document.getElementById('showTimestamp').checked=cfg.ts;
+      document.getElementById('speed').value=cfg.speed; document.getElementById('speedValue').innerText=cfg.speed+'ms';
+      document.getElementById('emojiList').value=cfg.list.join(',');
+      log('🔄 Config loaded');
     }
-
-    function setSpeed(ms) {
-      spamSpeed = ms;
-      logConsole(`⚡ Speed set to ${ms}ms`);
-      if (intervalId !== null) {
-        stopSending();
-        startSending();
-      }
+    function deleteConfig(i) {
+      const list=JSON.parse(localStorage.getItem(storageKey)||'[]'); list.splice(i,1);
+      localStorage.setItem(storageKey, JSON.stringify(list)); loadStorage(); log('🗑️ Config deleted');
     }
-
-    function deleteWebhook() {
-      const url = document.getElementById('webhookUrl').value;
-      if (!url) return alert("Please enter a webhook URL.");
-      const sure = confirm("⚠️ Are you sure you want to delete this webhook?");
-      if (sure) {
-        fetch(url, { method: 'DELETE' })
-          .then(res => {
-            if (res.ok) logConsole("🧹 Webhook deleted.");
-            else logConsole("❌ Failed to delete webhook.");
-          }).catch(err => {
-            logConsole("❌ Error deleting webhook: " + err);
-          });
-      }
-    }
-
-    function joinDiscord() {
-      window.open("https://discord.gg/YOUR_INVITE", "_blank");
-    }
+    // Init
+    loadStorage();
   </script>
 </body>
 </html>
