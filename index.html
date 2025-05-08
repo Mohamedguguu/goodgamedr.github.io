@@ -1,112 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Advanced Discord Webhook Spammer</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background: #1e1e2f;
-            color: #fff;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 8px;
-            margin: 6px 0;
-            box-sizing: border-box;
-            border-radius: 5px;
-            border: none;
-            background-color: #2c2f4a;
-            color: #fff;
-        }
-        button {
-            padding: 10px 20px;
-            margin: 5px 10px 5px 0;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .start { background-color: #4caf50; }
-        .stop { background-color: #f44336; }
-        .fast { background-color: #2196f3; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>💥 Discord Webhook Nuker 💥</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(130deg, #0f0f0f, #1a1a40, #0f0f0f);
+      color: #ffffff;
+      animation: bgmove 20s infinite alternate;
+      padding: 30px;
+    }
+
+    @keyframes bgmove {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 36px;
+      margin-bottom: 20px;
+      color: #ff00cc;
+      text-shadow: 0 0 10px #ff00cc;
+    }
+
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+      text-shadow: 0 0 5px #00ffff;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: none;
+      background-color: #1e1e2f;
+      color: #ffffff;
+      font-size: 14px;
+      transition: 0.3s;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      box-shadow: 0 0 10px #00ffff;
+    }
+
+    button {
+      padding: 10px 18px;
+      margin: 10px 8px 0 0;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      color: white;
+      transition: 0.3s;
+      box-shadow: 0 0 10px #00ffff;
+    }
+
+    .start { background-color: #28a745; }
+    .stop { background-color: #dc3545; }
+    .fast { background-color: #007bff; }
+    .ultrafast { background-color: #ffc107; color: black; }
+    .delete { background-color: #6f42c1; }
+    .start:hover, .stop:hover, .fast:hover, .ultrafast:hover, .delete:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #ffffff;
+    }
+
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 14px;
+      color: #aaa;
+    }
+  </style>
 </head>
 <body>
-    <h2>⚡ Discord Webhook Spammer</h2>
+  <h1>💥 Discord Webhook Nuker 💥</h1>
 
-    <label>Webhook URL:</label>
-    <input type="text" id="webhookUrl" placeholder="https://discord.com/api/webhooks/...">
+  <label>Webhook URL</label>
+  <input type="text" id="webhookUrl" placeholder="Paste Discord webhook URL here">
 
-    <label>Webhook Name:</label>
-    <input type="text" id="webhookName" placeholder="Webhook Bot Name">
+  <label>Webhook Username</label>
+  <input type="text" id="webhookName" placeholder="Webhook Bot Name (optional)">
 
-    <label>Avatar URL:</label>
-    <input type="text" id="avatarUrl" placeholder="https://example.com/avatar.png">
+  <label>Avatar URL</label>
+  <input type="text" id="avatarUrl" placeholder="Image URL for webhook avatar (optional)">
 
-    <label>Message to Send:</label>
-    <textarea id="message" rows="4" placeholder="Your message here..."></textarea>
+  <label>Message</label>
+  <textarea id="message" rows="4" placeholder="Your spam message..."></textarea>
 
-    <br>
-    <button class="start" onclick="startSending()">Start</button>
-    <button class="stop" onclick="stopSending()">Stop</button>
-    <button class="fast" onclick="enableFastSpam()">Fast Spam?</button>
+  <div>
+    <button class="start" onclick="startSending()">▶ Start</button>
+    <button class="stop" onclick="stopSending()">⏹ Stop</button>
+    <button class="fast" onclick="setSpeed(300)">⚡ Fast</button>
+    <button class="ultrafast" onclick="setSpeed(100)">🚀 Ultra Fast</button>
+    <button class="delete" onclick="deleteWebhook()">🧹 Delete Webhook</button>
+  </div>
 
-    <script>
-        let intervalId = null;
-        let fastMode = false;
+  <div class="footer">💻 Created for educational use — abuse = ban.</div>
 
-        function getRandomSuffix() {
-            return Math.floor(10000 + Math.random() * 90000); // 5-digit random number
-        }
+  <script>
+    let intervalId = null;
+    let spamSpeed = 1000;
 
-        function sendMessage() {
-            const webhookUrl = document.getElementById('webhookUrl').value;
-            const username = document.getElementById('webhookName').value;
-            const avatar_url = document.getElementById('avatarUrl').value;
-            const baseContent = document.getElementById('message').value;
+    function getRandomEmoji() {
+      const emojis = ['🔥', '💣', '⚡', '😈', '👾', '🚀', '💥', '🧨', '🎯'];
+      return emojis[Math.floor(Math.random() * emojis.length)];
+    }
 
-            if (!webhookUrl || !baseContent) {
-                alert("Please fill in the webhook URL and message.");
-                return;
-            }
+    function getRandomSuffix() {
+      return `${getRandomEmoji()} ${Math.floor(10000 + Math.random() * 99999)}`;
+    }
 
-            const payload = {
-                username: username || "Webhook Sender",
-                avatar_url: avatar_url || "",
-                content: `${baseContent} ${getRandomSuffix()}`
-            };
+    function sendMessage() {
+      const url = document.getElementById('webhookUrl').value;
+      const username = document.getElementById('webhookName').value;
+      const avatar = document.getElementById('avatarUrl').value;
+      const baseMsg = document.getElementById('message').value;
 
-            fetch(webhookUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            }).catch(error => console.error('Error:', error));
-        }
+      if (!url || !baseMsg) {
+        alert("Webhook URL and message required!");
+        return;
+      }
 
-        function startSending() {
-            if (intervalId === null) {
-                sendMessage(); // send one immediately
-                intervalId = setInterval(sendMessage, fastMode ? 500 : 2000); // faster or slower
-            }
-        }
+      const payload = {
+        content: `${baseMsg} ${getRandomSuffix()}`,
+        username: username || undefined,
+        avatar_url: avatar || undefined
+      };
 
-        function stopSending() {
-            clearInterval(intervalId);
-            intervalId = null;
-            fastMode = false;
-        }
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).catch(err => console.error("Send failed:", err));
+    }
 
-        function enableFastSpam() {
-            const confirmed = confirm("⚠️ Fast spam can trigger rate limits. Do you want to enable it?");
-            if (confirmed) {
-                fastMode = true;
-                alert("Fast spam mode enabled. Press 'Start' to begin.");
-            }
-        }
-    </script>
+    function startSending() {
+      if (intervalId !== null) return;
+      sendMessage();
+      intervalId = setInterval(sendMessage, spamSpeed);
+    }
+
+    function stopSending() {
+      clearInterval(intervalId);
+      intervalId = null;
+    }
+
+    function setSpeed(ms) {
+      spamSpeed = ms;
+      if (intervalId !== null) {
+        stopSending();
+        startSending();
+      }
+      alert(`🚀 Speed set to ${ms}ms per message`);
+    }
+
+    function deleteWebhook() {
+      const url = document.getElementById('webhookUrl').value;
+      if (!url) return alert("Webhook URL required!");
+      const confirmDelete = confirm("⚠️ Are you sure you want to DELETE this webhook?");
+      if (confirmDelete) {
+        fetch(url, { method: 'DELETE' })
+          .then(res => {
+            if (res.ok) alert("✅ Webhook deleted.");
+            else alert("❌ Failed to delete webhook.");
+          })
+          .catch(err => alert("Error deleting webhook: " + err));
+      }
+    }
+  </script>
 </body>
 </html>
