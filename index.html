@@ -5,30 +5,151 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>⚙️ Ultimate Webhook Spammer ⚙️</title>
   <style>
-    :root { --bg1:#0f0f0f; --bg2:#1a1a40; --accent:#00ffff; --accent2:#6f42c1; --text:#fff; --card:rgba(0,0,0,0.7); --valid:#28a745; --invalid:#dc3545; }
-    [data-theme="light"]{--bg1:#f4f4f8;--bg2:#dcdcf0;--text:#111;--card:rgba(255,255,255,0.8);--accent:#0077cc;--accent2:#6f42c1;}
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:'Segoe UI',sans-serif;color:var(--text);overflow-x:hidden;background:radial-gradient(circle at center,var(--bg2),var(--bg1));}
-    canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;}
-    h1{text-align:center;margin:20px auto;font-size:2.5rem;max-width:90%;background:linear-gradient(90deg,var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:underline 2s infinite;}
-    @keyframes underline{0%,100%{text-decoration:underline;}50%{text-decoration:none;}}
-    .container{width:95%;max-width:600px;margin:80px auto;background:var(--card);padding:20px;border-radius:12px;box-shadow:0 0 20px var(--accent2);backdrop-filter:blur(10px);}
-    label{display:block;margin-top:15px;font-weight:600;}
-    input,textarea,select{width:100%;padding:10px;margin-top:5px;border:2px solid transparent;border-radius:6px;background:rgba(50,50,70,0.5);color:var(--text);font-size:1rem;transition:box-shadow .3s,transform .2s;}
-    input:focus,textarea:focus{transform:scale(1.02);box-shadow:0 0 8px var(--accent2);outline:none;}
-    .drop-zone,.avatar-zone{position:relative;border:2px dashed transparent;padding:15px;border-radius:6px;text-align:center;cursor:pointer;background:rgba(50,50,70,0.3);margin-top:10px;}
-    .drop-zone.dragover,.avatar-zone.dragover{border-color:var(--accent2);}
-    .drop-zone img,.avatar-zone img{max-width:100%;max-height:120px;display:block;margin:10px auto;border-radius:4px;}
-    .section{margin-top:20px;}
-    .buttons{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:20px;}
-    button{flex:1 1 45%;padding:10px;font-size:1rem;border:none;border-radius:6px;cursor:pointer;transition:transform .2s,box-shadow .3s;background:var(--accent2);color:var(--text);}
-    button.start{background:var(--valid);color:#000;}button.stop{background:var(--invalid);}button:hover{transform:scale(1.05);box-shadow:0 0 8px var(--accent2);}
-    @media(max-width:480px){h1{font-size:2rem;}button{flex:1 1 100%;}}
-    #preview,#console{width:100%;margin-top:15px;padding:10px;background:rgba(30,30,40,0.7);border-radius:6px;font-family:monospace;max-height:150px;overflow-y:auto;white-space:pre-wrap;}
-    #console{color:#00ff88;}
-    .theme-toggle{position:fixed;top:20px;right:20px;width:40px;height:40px;border:2px solid var(--accent2);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .2s;background:none;z-index:1;}
-    .theme-toggle:hover{transform:rotate(20deg);}
-    .notice{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--accent2);color:var(--text);padding:10px 20px;border-radius:6px;opacity:0;transition:opacity .5s;z-index:1;}
+    :root {
+      --bg1: #0f0f0f;
+      --bg2: #1a1a40;
+      --accent: #00ffff;
+      --accent2: #6f42c1;
+      --text: #fff;
+      --card: rgba(0,0,0,0.7);
+      --valid: #28a745;
+      --invalid: #dc3545;
+    }
+    [data-theme="light"] {
+      --bg1: #f4f4f8;
+      --bg2: #dcdcf0;
+      --text: #111;
+      --card: rgba(255,255,255,0.8);
+      --accent: #0077cc;
+      --accent2: #6f42c1;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      color: var(--text);
+      overflow-x: hidden;
+      background: radial-gradient(circle at center, var(--bg2), var(--bg1));
+    }
+    canvas#bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+    h1 {
+      text-align: center;
+      margin: 20px auto;
+      font-size: 2.5rem;
+      max-width: 90%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: underline 2s infinite;
+    }
+    @keyframes underline {
+      0%, 100% { text-decoration: underline; }
+      50% { text-decoration: none; }
+    }
+    .container {
+      width: 95%; max-width: 600px;
+      margin: 80px auto;
+      background: var(--card);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px var(--accent2);
+      backdrop-filter: blur(10px);
+    }
+    label { display: block; margin-top: 15px; font-weight: 600; }
+    input, textarea, select {
+      width: 100%; padding: 10px; margin-top: 5px;
+      border: 2px solid transparent;
+      border-radius: 6px;
+      background: rgba(50,50,70,0.5);
+      color: var(--text);
+      font-size: 1rem;
+      transition: box-shadow .3s, transform .2s;
+    }
+    input:focus, textarea:focus {
+      transform: scale(1.02);
+      box-shadow: 0 0 8px var(--accent2);
+      outline: none;
+    }
+    .drop-zone, .avatar-zone {
+      position: relative;
+      border: 2px dashed transparent;
+      padding: 15px;
+      border-radius: 6px;
+      text-align: center;
+      cursor: pointer;
+      background: rgba(50,50,70,0.3);
+      margin-top: 10px;
+    }
+    .drop-zone.dragover, .avatar-zone.dragover { border-color: var(--accent2); }
+    .drop-zone img, .avatar-zone img {
+      max-width: 100%; max-height: 120px;
+      display: block; margin: 10px auto;
+      border-radius: 4px;
+    }
+    .section { margin-top: 20px; }
+    .buttons {
+      display: flex; flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    button {
+      flex: 1 1 45%; padding: 10px; font-size: 1rem;
+      border: none; border-radius: 6px;
+      cursor: pointer;
+      transition: transform .2s, box-shadow .3s;
+      background: var(--accent2);
+      color: var(--text);
+    }
+    button.start { background: var(--valid); color: #000; }
+    button.stop { background: var(--invalid); }
+    button:hover { transform: scale(1.05); box-shadow: 0 0 8px var(--accent2); }
+    @media(max-width:480px) {
+      h1 { font-size: 2rem; }
+      button { flex: 1 1 100%; }
+    }
+    #preview, #console {
+      width: 100%; margin-top: 15px;
+      padding: 10px;
+      background: rgba(30,30,40,0.7);
+      border-radius: 6px;
+      font-family: monospace;
+      max-height: 150px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    #console { color: #00ff88; }
+    .theme-toggle {
+      position: fixed; top: 20px; right: 20px;
+      width: 40px; height: 40px;
+      border: 2px solid var(--accent2);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: transform .2s;
+      background: none;
+      z-index: 1;
+    }
+    .theme-toggle:hover { transform: rotate(20deg); }
+    .notice {
+      position: fixed; bottom: 20px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent2);
+      color: var(--text);
+      padding: 10px 20px;
+      border-radius: 6px;
+      opacity: 0;
+      transition: opacity .5s;
+      z-index: 1;
+    }
+    /* New classes for validation feedback */
+    .valid {
+      border-color: var(--valid) !important;
+      box-shadow: 0 0 8px var(--valid) !important;
+    }
+    .invalid {
+      border-color: var(--invalid) !important;
+      box-shadow: 0 0 8px var(--invalid) !important;
+    }
   </style>
 </head>
 <body data-theme="dark">
@@ -36,24 +157,31 @@
   <div class="theme-toggle" onclick="toggleTheme()">🌗</div>
   <h1>Ultimate Webhook Spammer</h1>
   <div class="container">
-    <label>Webhook URL</label><input id="webhookUrl" placeholder="https://discord.com/api/webhooks/..." />
+    <label>Webhook URL</label>
+    <input id="webhookUrl" placeholder="https://discord.com/api/webhooks/..." />
     <label>Avatar (URL or Drag & Drop)</label>
     <input id="avatarUrl" placeholder="https://...png" />
     <div id="avatarZone" class="avatar-zone">Or drag & drop avatar here</div>
     <input type="file" id="avatarInput" accept="image/*" style="display:none" />
 
-    <label>Name (Optional)</label><input id="webhookName" placeholder="Bot Name" />
-    <label>Message</label><textarea id="message" rows="3"></textarea>
+    <label>Name (Optional)</label>
+    <input id="webhookName" placeholder="Bot Name" />
+    <label>Message</label>
+    <textarea id="message" rows="3"></textarea>
     <label>File Attachment (Drag & Drop)</label>
     <div id="dropZone" class="drop-zone">Drag & drop file here</div>
     <input type="file" id="fileInput" accept="image/*" style="display:none" />
 
     <div class="section embed-settings">
       <h2>Embed Settings</h2>
-      <label>Embed Title</label><input id="embedTitle" />
-      <label>Embed Description</label><textarea id="embedDesc" rows="2"></textarea>
-      <label>Embed Color (hex)</label><input id="embedColor" placeholder="#00ff00" />
-      <label>Embed Image (URL or Drag & Drop)</label><input id="embedImageUrl" placeholder="https://...png" />
+      <label>Embed Title</label>
+      <input id="embedTitle" />
+      <label>Embed Description</label>
+      <textarea id="embedDesc" rows="2"></textarea>
+      <label>Embed Color (hex)</label>
+      <input id="embedColor" placeholder="#00ff00" />
+      <label>Embed Image (URL or Drag & Drop)</label>
+      <input id="embedImageUrl" placeholder="https://...png" />
       <div id="embedZone" class="drop-zone">Or drag & drop embed image here</div>
       <input type="file" id="embedInput" accept="image/*" style="display:none" />
     </div>
@@ -65,8 +193,10 @@
       <label><input type="checkbox" id="showTimestamp"/> Timestamp</label>
       <label>Speed: <span id="speedValue">1000ms</span></label>
       <input id="speed" type="range" min="100" max="3000" step="100" value="1000" />
-      <label>Emoji List</label><input id="emojiList" value="🔥,💣,⚡,🚀,🎯" />
-      <label>Retry Delay(ms)</label><input id="retryDelay" type="number" min="100" step="100" value="5000" />
+      <label>Emoji List</label>
+      <input id="emojiList" value="🔥,💣,⚡,🚀,🎯" />
+      <label>Retry Delay(ms)</label>
+      <input id="retryDelay" type="number" min="100" step="100" value="5000" />
     </div>
 
     <div class="section storage">
@@ -92,79 +222,185 @@
 
   <script>
     // Background particles
-    const canvas=document.getElementById('bg'),ctx=canvas.getContext('2d');let w,h,particles=[];
-    class Particle{constructor(){this.reset();}reset(){this.x=Math.random()*w;this.y=Math.random()*h;this.r=Math.random()*2+1;this.vx=(Math.random()-0.5)*0.5;this.vy=(Math.random()-0.5)*0.5;}draw(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>w||this.y<0||this.y>h)this.reset();ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,2*Math.PI);ctx.fillStyle='rgba(255,255,255,0.05)';ctx.fill();}};
-    function initBg(){w=canvas.width=innerWidth;h=canvas.height=innerHeight;particles=[];for(let i=0;i<150;i++)particles.push(new Particle());}
-    function animateBg(){ctx.clearRect(0,0,w,h);particles.forEach(p=>p.draw());requestAnimationFrame(animateBg);}window.addEventListener('resize',initBg);initBg();animateBg();
+    const canvas = document.getElementById('bg'), ctx = canvas.getContext('2d');
+    let w, h, particles = [];
+    class Particle {
+      constructor() { this.reset(); }
+      reset() { this.x = Math.random()*w; this.y = Math.random()*h; this.r = Math.random()*2+1; this.vx = (Math.random()-0.5)*0.5; this.vy = (Math.random()-0.5)*0.5; }
+      draw() { this.x += this.vx; this.y += this.vy;
+        if (this.x<0 || this.x>w || this.y<0 || this.y>h) this.reset();
+        ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,2*Math.PI);
+        ctx.fillStyle='rgba(255,255,255,0.05)'; ctx.fill();
+      }
+    }
+    function initBg() { w = canvas.width = innerWidth; h = canvas.height = innerHeight; particles = []; for (let i = 0; i < 150; i++) particles.push(new Particle()); }
+    function animateBg() { ctx.clearRect(0,0,w,h); particles.forEach(p => p.draw()); requestAnimationFrame(animateBg); }
+    window.addEventListener('resize', initBg);
+    initBg(); animateBg();
 
     // Theme & notice
-    function toggleTheme(){document.body.dataset.theme=document.body.dataset.theme==='dark'?'light':'dark';}
-    function showNotice(msg){const n=document.getElementById('notice');n.textContent=msg;n.style.opacity=1;setTimeout(()=>n.style.opacity=0,3000);}
+    function toggleTheme() { document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark'; }
+    function showNotice(msg) { const n = document.getElementById('notice'); n.textContent = msg; n.style.opacity = 1; setTimeout(() => n.style.opacity = 0, 3000); }
 
     // state
-    let avatarFile=null,droppedFile=null,embedFile=null,intervalId=null,count=0;
-    const storageKey='webhookConfigs';
+    let avatarFile = null, droppedFile = null, embedFile = null, intervalId = null, count = 0;
+    const storageKey = 'webhookConfigs';
 
     // zones
-    function setupZone(zoneId,inputId,assign){const zone=document.getElementById(zoneId),inp=document.getElementById(inputId);
-      zone.addEventListener('click',()=>inp.click());inp.addEventListener('change',e=>handle(e.target.files));
-      ['dragover','dragenter'].forEach(e=>zone.addEventListener(e,ev=>{ev.preventDefault();zone.classList.add('dragover');}));
-      ['dragleave','drop'].forEach(e=>zone.addEventListener(e,ev=>{ev.preventDefault();zone.classList.remove('dragover');if(e==='drop')handle(ev.dataTransfer.files);}));
-      function handle(files){const f=files[0];if(f&&f.type.startsWith('image/')){assign(f);const r=new FileReader();r.onload=()=>zone.innerHTML=`<img src="${r.result}"/>`;r.readAsDataURL(f);}else alert('Only images allowed');}}
-    setupZone('avatarZone','avatarInput',f=>avatarFile=f);
-    setupZone('dropZone','fileInput',f=>droppedFile=f);
-    setupZone('embedZone','embedInput',f=>embedFile=f);
+    function setupZone(zoneId, inputId, assign) {
+      const zone = document.getElementById(zoneId), inp = document.getElementById(inputId);
+      zone.addEventListener('click', () => inp.click());
+      inp.addEventListener('change', e => handle(e.target.files));
+      ['dragover','dragenter'].forEach(evt => zone.addEventListener(evt, ev => { ev.preventDefault(); zone.classList.add('dragover'); }));
+      ['dragleave','drop'].forEach(evt => zone.addEventListener(evt, ev => { ev.preventDefault(); zone.classList.remove('dragover'); if (evt === 'drop') handle(ev.dataTransfer.files); }));
+      function handle(files) { const f = files[0]; if (f && f.type.startsWith('image/')) { assign(f); const r = new FileReader(); r.onload = () => zone.innerHTML = `<img src="${r.result}"/>`; r.readAsDataURL(f); } else alert('Only images allowed'); }
+    }
+    setupZone('avatarZone','avatarInput', f => avatarFile = f);
+    setupZone('dropZone','fileInput', f => droppedFile = f);
+    setupZone('embedZone','embedInput', f => embedFile = f);
 
     // config
-    function getConfig(){return{
-      url:document.getElementById('webhookUrl').value.trim(),
-      name:document.getElementById('webhookName').value.trim(),
-      base:document.getElementById('message').value,
-      emojis:document.getElementById('useEmoji').checked,
-      numbers:document.getElementById('useNumber').checked,
-      timestamp:document.getElementById('showTimestamp').checked,
-      speed:+document.getElementById('speed').value,
-      retryDelay:+document.getElementById('retryDelay').value,
-      list:document.getElementById('emojiList').value.split(',').map(s=>s.trim()).filter(Boolean),
-      embed:{title:document.getElementById('embedTitle').value,description:document.getElementById('embedDesc').value,color:document.getElementById('embedColor').value.trim()},
-      avatarUrl:document.getElementById('avatarUrl').value.trim()
-    }}
-    function buildPayload(cfg){const parts=[];if(cfg.emojis)parts.push(cfg.list[Math.floor(Math.random()*cfg.list.length)]);if(cfg.numbers)parts.push(Math.floor(Math.random()*90000+10000));if(cfg.timestamp)parts.push(new Date().toLocaleTimeString());
-      const content=cfg.base+(parts.length?' '+parts.join(' '):'');const p={content};if(cfg.name)p.username=cfg.name;
-      if(avatarFile)p.avatar_url=undefined;else if(cfg.avatarUrl)p.avatar_url=cfg.avatarUrl;
-      const e=cfg.embed;const hasEmbed=e.title||e.description||embedFile;
-      if(hasEmbed){const obj={};if(e.title)obj.title=e.title;if(e.description)obj.description=e.description;if(e.color)obj.color=parseInt(e.color.replace('#',''),16);if(embedFile)obj.image={url:'attachment://'+embedFile.name};p.embeds=[obj];}
-      preview(p);return p;}
-    function preview(p){document.getElementById('preview').textContent=JSON.stringify(p,null,2);}
+    function getConfig() {
+      return {
+        url: document.getElementById('webhookUrl').value.trim(),
+        name: document.getElementById('webhookName').value.trim(),
+        base: document.getElementById('message').value,
+        emojis: document.getElementById('useEmoji').checked,
+        numbers: document.getElementById('useNumber').checked,
+        timestamp: document.getElementById('showTimestamp').checked,
+        speed: +document.getElementById('speed').value,
+        retryDelay: +document.getElementById('retryDelay').value,
+        list: document.getElementById('emojiList').value.split(',').map(s => s.trim()).filter(Boolean),
+        embed: {
+          title: document.getElementById('embedTitle').value,
+          description: document.getElementById('embedDesc').value,
+          color: document.getElementById('embedColor').value.trim()
+        },
+        avatarUrl: document.getElementById('avatarUrl').value.trim()
+      };
+    }
+    function buildPayload(cfg) {
+      const parts = [];
+      if (cfg.emojis) parts.push(cfg.list[Math.floor(Math.random()*cfg.list.length)]);
+      if (cfg.numbers) parts.push(Math.floor(Math.random()*90000+10000));
+      if (cfg.timestamp) parts.push(new Date().toLocaleTimeString());
+      const content = cfg.base + (parts.length ? ' ' + parts.join(' ') : '');
+      const p = { content };
+      if (cfg.name) p.username = cfg.name;
+      if (avatarFile) p.avatar_url = undefined;
+      else if (cfg.avatarUrl) p.avatar_url = cfg.avatarUrl;
+      const e = cfg.embed;
+      const hasEmbed = e.title || e.description || embedFile;
+      if (hasEmbed) {
+        const obj = {};
+        if (e.title) obj.title = e.title;
+        if (e.description) obj.description = e.description;
+        if (e.color) obj.color = parseInt(e.color.replace('#',''), 16);
+        if (embedFile) obj.image = { url: 'attachment://' + embedFile.name };
+        p.embeds = [obj];
+      }
+      preview(p);
+      return p;
+    }
+    function preview(p) { document.getElementById('preview').textContent = JSON.stringify(p,null,2); }
 
     // spam
-    async function sendMessage(){const cfg=getConfig();if(!cfg.url||!cfg.base)return;
-      const payload=buildPayload(cfg);const form=new FormData();if(avatarFile)form.append('file',avatarFile,avatarFile.name);if(embedFile)form.append('file',embedFile,embedFile.name);if(droppedFile)form.append('file',droppedFile,droppedFile.name);
-      form.append('payload_json',JSON.stringify(payload));try{const res=await fetch(cfg.url,{method:'POST',body:form});if(res.ok||res.status===204){count++;log(`Sent #${count}`);}else if(res.status===429){log(`Rate limited, retrying in ${cfg.retryDelay}ms`);stopSpam();setTimeout(startSpam,cfg.retryDelay);}else{log(`Error ${res.status}`);}}catch(e){log('Network error');stopSpam();}}
-    function startSpam(){if(intervalId)return;count=0;clearConsole();log('Spamming started');sendMessage();intervalId=setInterval(sendMessage,getConfig().speed);document.getElementById('startBtn').disabled=true;document.getElementById('stopBtn').disabled=false;}
-    function stopSpam(){clearInterval(intervalId);intervalId=null;log('Spamming stopped');document.getElementById('startBtn').disabled=false;document.getElementById('stopBtn').disabled=true;}
+    async function sendMessage() {
+      const cfg = getConfig();
+      if (!cfg.url || !cfg.base) return;
+      const payload = buildPayload(cfg);
+      const form = new FormData();
+      if (avatarFile) form.append('file', avatarFile, avatarFile.name);
+      if (embedFile) form.append('file', embedFile, embedFile.name);
+      if (droppedFile) form.append('file', droppedFile, droppedFile.name);
+      form.append('payload_json', JSON.stringify(payload));
+      try {
+        const res = await fetch(cfg.url, { method: 'POST', body: form });
+        if (res.ok || res.status === 204) { count++; log(`Sent #${count}`); }
+        else if (res.status === 429) { log(`Rate limited, retrying in ${cfg.retryDelay}ms`); stopSpam(); setTimeout(startSpam, cfg.retryDelay); }
+        else { log(`Error ${res.status}`); }
+      } catch (e) { log('Network error'); stopSpam(); }
+    }
+    function startSpam() { if (intervalId) return; count = 0; clearConsole(); log('Spamming started'); sendMessage(); intervalId = setInterval(sendMessage, getConfig().speed); document.getElementById('startBtn').disabled = true; document.getElementById('stopBtn').disabled = false; }
+    function stopSpam() { clearInterval(intervalId); intervalId = null; log('Spamming stopped'); document.getElementById('startBtn').disabled = false; document.getElementById('stopBtn').disabled = true; }
 
     // utilities
-    function log(msg){const c=document.getElementById('console'),d=document.createElement('div'),ts=document.createElement('span');d.className='log-entry';ts.className='timestamp';ts.textContent=new Date().toLocaleTimeString()+' -';d.appendChild(ts);d.appendChild(document.createTextNode(' '+msg));c.appendChild(d);c.scrollTop=c.scrollHeight;showNotice(msg);}    
-    function clearConsole(){document.getElementById('console').innerHTML='▶ Console cleared...';}
-    function clearFields(){['webhookUrl','avatarUrl','webhookName','message','embedTitle','embedDesc','embedColor','embedImageUrl','retryDelay'].forEach(id=>document.getElementById(id).value='');avatarFile=droppedFile=embedFile=null;['avatarZone','dropZone','embedZone'].forEach(z=>document.getElementById(z).innerHTML=z.includes('avatar')?'Or drag & drop avatar here':'Drag & drop '+(z==='dropZone'?'file':'embed image')+' here');document.getElementById('useEmoji').checked=true;document.getElementById('useNumber').checked=true;document.getElementById('showTimestamp').checked=false;showNotice('Fields cleared');}
-    function checkWebhook(){const url=document.getElementById('webhookUrl').value.trim();if(!url)return;fetch(url).then(r=>showNotice(r.ok?'Webhook valid':`Invalid: ${r.status}`)).catch(()=>showNotice('Network error'));}
+    function log(msg) {
+      const c = document.getElementById('console'); const d = document.createElement('div'); const ts = document.createElement('span');
+      d.className = 'log-entry'; ts.className = 'timestamp'; ts.textContent = new Date().toLocaleTimeString() + ' -';
+      d.appendChild(ts); d.appendChild(document.createTextNode(' ' + msg));
+      c.appendChild(d); c.scrollTop = c.scrollHeight; showNotice(msg);
+    }
+    function clearConsole() { document.getElementById('console').innerHTML = '▶ Console cleared...'; }
+    function clearFields() {
+      ['webhookUrl','avatarUrl','webhookName','message','embedTitle','embedDesc','embedColor','embedImageUrl','retryDelay'].forEach(id => document.getElementById(id).value = '');
+      avatarFile = droppedFile = embedFile = null;
+      ['avatarZone','dropZone','embedZone'].forEach(z => document.getElementById(z).innerHTML = z.includes('avatar') ? 'Or drag & drop avatar here' : 'Drag & drop ' + (z === 'dropZone' ? 'file' : 'embed image') + ' here');
+      document.getElementById('useEmoji').checked = true;
+      document.getElementById('useNumber').checked = true;
+      document.getElementById('showTimestamp').checked = false;
+      showNotice('Fields cleared');
+    }
+
+    // VALIDATION: updated for green/red border feedback
+    function checkWebhook() {
+      const urlInput = document.getElementById('webhookUrl');
+      const url = urlInput.value.trim();
+      if (!url) {
+        showNotice('Please enter a webhook URL');
+        urlInput.classList.remove('valid','invalid');
+        return;
+      }
+      urlInput.classList.remove('valid','invalid');
+      fetch(url)
+        .then(r => {
+          if (r.ok || r.status === 204) {
+            showNotice('Webhook valid');
+            urlInput.classList.add('valid');
+          } else {
+            showNotice(`Invalid: ${r.status}`);
+            urlInput.classList.add('invalid');
+          }
+        })
+        .catch(() => {
+          showNotice('Network error');
+          urlInput.classList.add('invalid');
+        });
+    }
 
     // storage
-    function loadStorageList(){const list=JSON.parse(localStorage.getItem(storageKey)||'[]'),c=document.getElementById('storageList');c.innerHTML='';list.forEach((cfg,i)=>{const d=document.createElement('div');d.className='storage-item';d.innerHTML=`<span>${cfg.name||cfg.url}</span> <button onclick="applyStorage(${i})">Load</button> <button onclick="deleteStorage(${i})">Del</button>`;c.appendChild(d);});}
-    function saveConfig(){const cfg=getConfig();if(!cfg.url)return;const list=JSON.parse(localStorage.getItem(storageKey)||'[]');list.push(cfg);localStorage.setItem(storageKey,JSON.stringify(list));loadStorageList();showNotice('Config saved');}
-    function applyStorage(i){const list=JSON.parse(localStorage.getItem(storageKey)||'[]'),cfg=list[i];Object.entries(cfg).forEach(([k,v])=>{if(k==='embed'){document.getElementById('embedTitle').value=v.title||'';document.getElementById('embedDesc').value=v.description||'';document.getElementById('embedColor').value=v.color||'';}else if(document.getElementById(k)){const e=document.getElementById(k);if(e.type==='checkbox')e.checked=v;else e.value=v;}});showNotice('Config loaded');}
-    function deleteStorage(i){const l=JSON.parse(localStorage.getItem(storageKey)||'[]');l.splice(i,1);localStorage.setItem(storageKey,JSON.stringify(l));loadStorageList();showNotice('Deleted');}
-    function loadLastConfig(){const l=JSON.parse(localStorage.getItem(storageKey)||'[]');l.length?applyStorage(l.length-1):showNotice('No configs');}
+    function loadStorageList() {
+      const list = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      const c = document.getElementById('storageList'); c.innerHTML = '';
+      list.forEach((cfg, i) => {
+        const d = document.createElement('div'); d.className = 'storage-item';
+        d.innerHTML = `<span>${cfg.name||cfg.url}</span> <button onclick="applyStorage(${i})">Load</button> <button onclick="deleteStorage(${i})">Del</button>`;
+        c.appendChild(d);
+      });
+    }
+    function saveConfig() { const cfg = getConfig(); if (!cfg.url) return; const list = JSON.parse(localStorage.getItem(storageKey)||'[]'); list.push(cfg); localStorage.setItem(storageKey, JSON.stringify(list)); loadStorageList(); showNotice('Config saved'); }
+    function applyStorage(i) { const list = JSON.parse(localStorage.getItem(storageKey)||'[]'), cfg = list[i]; Object.entries(cfg).forEach(([k,v]) => {
+      if (k === 'embed') {
+        document.getElementById('embedTitle').value = v.title||'';
+        document.getElementById('embedDesc').value = v.description||'';
+        document.getElementById('embedColor').value = v.color||'';
+      } else if (document.getElementById(k)) {
+        const e = document.getElementById(k);
+        if (e.type === 'checkbox') e.checked = v;
+        else e.value = v;
+      }
+    }); showNotice('Config loaded'); }
+    function deleteStorage(i) { const l = JSON.parse(localStorage.getItem(storageKey)||'[]'); l.splice(i,1); localStorage.setItem(storageKey, JSON.stringify(l)); loadStorageList(); showNotice('Deleted'); }
+    function loadLastConfig() { const l = JSON.parse(localStorage.getItem(storageKey)||'[]'); l.length ? applyStorage(l.length-1) : showNotice('No configs'); }
 
     // events
-    document.getElementById('startBtn').onclick=startSpam;
-    document.getElementById('stopBtn').onclick=stopSpam;
-    document.getElementById('checkBtn').onclick=checkWebhook;
-    document.getElementById('clearConsoleBtn').onclick=clearConsole;
-    document.getElementById('clearPreviewBtn').onclick=preview;
-    document.getElementById('clearFieldsBtn').onclick=clearFields;
-    document.getElementById('speed').addEventListener('input',e=>document.getElementById('speedValue').textContent=e.target.value+'ms');
+    document.getElementById('startBtn').onclick = startSpam;
+    document.getElementById('stopBtn').onclick = stopSpam;
+    document.getElementById('checkBtn').onclick = checkWebhook;
+    document.getElementById('clearConsoleBtn').onclick = clearConsole;
+    document.getElementById('clearPreviewBtn').onclick = () => preview({});
+    document.getElementById('clearFieldsBtn').onclick = clearFields;
+    document.getElementById('speed').addEventListener('input', e => document.getElementById('speedValue').textContent = e.target.value + 'ms');
     loadStorageList();
   </script>
 </body>
