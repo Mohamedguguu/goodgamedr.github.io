@@ -83,8 +83,17 @@
       border: 2px dashed transparent;
       padding: 10px;
       border-radius: 6px;
+      text-align: center;
+      cursor: pointer;
+      background: rgba(50, 50, 70, 0.3);
     }
     .drop-zone.dragover { border-color: var(--accent2); }
+    .drop-zone img {
+      max-width: 100%;
+      max-height: 150px;
+      display: block;
+      margin: 10px auto;
+    }
     .settings, .storage, .embed-settings {
       margin-top: 20px;
       padding: 15px;
@@ -180,8 +189,9 @@
     <label>Message</label>
     <textarea id="message" rows="3"></textarea>
 
-    <label>File Attachment URL</label>
-    <input id="fileUrl" placeholder="https://...png" />
+    <label>File Attachment</label>
+    <div id="dropZone" class="drop-zone">Drag & drop image here or click to select</div>
+    <input type="file" id="fileInput" accept="image/*" style="display:none" />
 
     <!-- Embed Settings -->
     <div class="embed-settings">
@@ -200,7 +210,7 @@
       <label><input type="checkbox" id="showTimestamp"/> Add Timestamp</label>
       <div class="slider-container">
         <div class="slider-label">Speed: <span id="speedValue">1000ms</span></div>
-        <input type="range" id="speed" class="slider" min="100" max="3000" step="100" value="1000"/>
+        <input type="range" id="speed" min="100" max="3000" step="100" value="1000"/>
       </div>
       <label>Emoji List</label><input id="emojiList" value="🔥,💣,⚡,🚀,🎯" />
       <label>Retry Delay on Rate Limit (ms)</label><input id="retryDelay" type="number" min="100" step="100" value="5000" />
@@ -251,6 +261,7 @@
     const storageKey = 'webhookConfigs';
     let intervalId = null;
     let count = 0;
+    let droppedFile = null;
 
     // Logging with timestamp
     function log(message) {
@@ -276,18 +287,43 @@
       document.getElementById('preview').textContent = '▶ Payload Preview...';
     }
     function clearFields() {
-      ['webhookUrl','avatarUrl','webhookName','message','fileUrl','embedTitle','embedDesc','embedColor','embedImageUrl','retryDelay'].forEach(id => {
+      ['webhookUrl','avatarUrl','webhookName','message','embedTitle','embedDesc','embedColor','embedImageUrl','retryDelay'].forEach(id => {
         document.getElementById(id).value = '';
       });
+      droppedFile = null;
       document.getElementById('useEmoji').checked = true;
       document.getElementById('useNumber').checked = true;
       document.getElementById('showTimestamp').checked = false;
+      document.getElementById('dropZone').innerHTML = 'Drag & drop image here or click to select';
       showNotice('Fields cleared');
     }
 
+    // Update speed display
     document.getElementById('speed').addEventListener('input', (e) => {
       document.getElementById('speedValue').textContent = e.target.value + 'ms';
     });
+
+    // File drag & drop handlers
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    dropZone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+    });
+    function handleFiles(files) {
+      const file = files[0];
+      if (file && file.type.startsWith('image/')) {
+        droppedFile = file;
+        const reader = new FileReader();
+        reader.onload = () => { dropZone.innerHTML = `<img src="${reader.result}" alt="Preview" />`; };
+        reader.readAsDataURL(file);
+      } else alert('Only images are allowed');
+    }
 
     // Config helpers
     function getConfig() {
@@ -296,7 +332,6 @@
         avatar: document.getElementById('avatarUrl').value.trim(),
         name: document.getElementById('webhookName').value.trim(),
         base: document.getElementById('message').value,
-        fileUrl: document.getElementById('fileUrl').value.trim(),
         emojis: document.getElementById('useEmoji').checked,
         numbers: document.getElementById('useNumber').checked,
         timestamp: document.getElementById('showTimestamp').checked,
@@ -336,18 +371,13 @@
 
     async function sendMessage() {
       const cfg = getConfig();
-      if (!cfg.url || !cfg.base) {
-        log('Missing URL or message');
-        stopSpam();
-        return;
-      }
+      if (!cfg.url || !cfg.base) { log('Missing URL or message'); stopSpam(); return; }
       try {
         const payload = buildPayload(cfg);
         let res;
-        if (cfg.fileUrl.startsWith('http')) {
-          // send as file attachment if URL provided
+        if (droppedFile) {
           const form = new FormData();
-          form.append('file', new Blob(), 'file');
+          form.append('file', droppedFile, droppedFile.name);
           form.append('payload_json', JSON.stringify(payload));
           res = await fetch(cfg.url, { method: 'POST', body: form });
         } else {
@@ -357,80 +387,48 @@
             body: JSON.stringify(payload)
           });
         }
-        if (res.status === 204 || res.ok) {
-          count++;
-          log(`Sent #${count}`);
-        } else if (res.status === 429) {
-          log(`Rate limited, retrying in ${cfg.retryDelay}ms`);
-          stopSpam();
-          setTimeout(startSpam, cfg.retryDelay);
-        } else if ([404, 410].includes(res.status)) {
-          log('Webhook not found/deleted');
-          stopSpam();
-        } else {
-          log(`Error ${res.status}`);
-        }
-      } catch (e) {
-        log('Network error');
-        stopSpam();
-      }
+        if (res.status === 204 || res.ok) { count++; log(`Sent #${count}`); }
+        else if (res.status === 429) { log(`Rate limited, retrying in ${cfg.retryDelay}ms`); stopSpam(); setTimeout(startSpam, cfg.retryDelay); }
+        else if ([404,410].includes(res.status)) { log('Webhook not found/deleted'); stopSpam(); }
+        else { log(`Error ${res.status}`); }
+      } catch (e) { log('Network error'); stopSpam(); }
     }
 
     function startSpam() {
       if (intervalId) return;
-      count = 0;
-      clearConsole();
-      log('Spamming started');
-      const cfg = getConfig();
-      sendMessage();
+      count = 0; clearConsole(); log('Spamming started');
+      const cfg = getConfig(); sendMessage();
       intervalId = setInterval(sendMessage, cfg.speed);
       document.getElementById('startBtn').disabled = true;
       document.getElementById('stopBtn').disabled = false;
     }
-    function stopSpam() {
-      clearInterval(intervalId);
-      intervalId = null;
-      log('Spamming stopped');
-      document.getElementById('startBtn').disabled = false;
-      document.getElementById('stopBtn').disabled = true;
-    }
+    function stopSpam() { clearInterval(intervalId); intervalId = null; log('Spamming stopped'); document.getElementById('startBtn').disabled = false; document.getElementById('stopBtn').disabled = true; }
 
-    // Webhook validation
     async function checkWebhook() {
       const url = document.getElementById('webhookUrl').value.trim();
       if (!url) { showNotice('No URL provided'); return; }
       try {
         const res = await fetch(url, { method: 'GET' });
         showNotice(res.ok ? 'Webhook valid' : `Invalid: ${res.status}`);
-      } catch {
-        showNotice('Network error');
-      }
+      } catch { showNotice('Network error'); }
     }
 
-    // Storage functions
     function loadStorageList() {
       const list = JSON.parse(localStorage.getItem(storageKey) || '[]');
-      const container = document.getElementById('storageList');
-      container.innerHTML = '';
+      const container = document.getElementById('storageList'); container.innerHTML = '';
       list.forEach((cfg, i) => {
-        const div = document.createElement('div');
-        div.className = 'storage-item';
+        const div = document.createElement('div'); div.className = 'storage-item';
         div.innerHTML = `<span>${cfg.name || cfg.url}</span> <button onclick="applyStorage(${i})">Load</button> <button onclick="deleteStorage(${i})">Del</button>`;
         container.appendChild(div);
       });
     }
     function saveConfig() {
-      const cfg = getConfig();
-      if (!cfg.url) { showNotice('No URL provided'); return; }
-      const list = JSON.parse(localStorage.getItem(storageKey) || '[]');
-      list.push(cfg);
-      localStorage.setItem(storageKey, JSON.stringify(list));
-      loadStorageList();
-      showNotice('Config saved');
+      const cfg = getConfig(); if (!cfg.url) { showNotice('No URL provided'); return; }
+      const list = JSON.parse(localStorage.getItem(storageKey) || '[]'); list.push(cfg);
+      localStorage.setItem(storageKey, JSON.stringify(list)); loadStorageList(); showNotice('Config saved');
     }
     function applyStorage(idx) {
-      const list = JSON.parse(localStorage.getItem(storageKey) || '[]');
-      const cfg = list[idx];
+      const list = JSON.parse(localStorage.getItem(storageKey) || '[]'); const cfg = list[idx];
       Object.entries(cfg).forEach(([key, val]) => {
         if (key === 'embed') {
           document.getElementById('embedTitle').value = val.title || '';
@@ -442,15 +440,11 @@
           if (el.type === 'checkbox') el.checked = val;
           else el.value = Array.isArray(val) ? val.join(',') : val;
         }
-      });
-      showNotice('Config loaded');
+      }); showNotice('Config loaded');
     }
     function deleteStorage(idx) {
-      const list = JSON.parse(localStorage.getItem(storageKey) || '[]');
-      list.splice(idx, 1);
-      localStorage.setItem(storageKey, JSON.stringify(list));
-      loadStorageList();
-      showNotice('Config deleted');
+      const list = JSON.parse(localStorage.getItem(storageKey) || '[]'); list.splice(idx, 1);
+      localStorage.setItem(storageKey, JSON.stringify(list)); loadStorageList(); showNotice('Config deleted');
     }
     function loadLastConfig() {
       const list = JSON.parse(localStorage.getItem(storageKey) || '[]');
