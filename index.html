@@ -1,11 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>My Simple Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Webhook Sender</title>
+    <script>
+        function sendWebhook() {
+            const discordWebhookUrl = 'https://discord.com/api/webhooks/your-webhook-id/your-webhook-token'; // Replace with your Discord webhook URL
+
+            const payload = {
+                content: document.getElementById('message').value,
+                username: document.getElementById('username').value
+            };
+
+            fetch(discordWebhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Webhook sent successfully:', data);
+                alert('Webhook sent successfully!');
+            })
+            .catch(error => {
+                console.error('Error sending webhook:', error);
+                alert('Failed to send webhook');
+            });
+        }
+    </script>
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <p>This is a simple HTML page.</p>
+    <h1>Discord Webhook Sender</h1>
+    <form onsubmit="event.preventDefault(); sendWebhook();">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br><br>
+
+        <label for="message">Message:</label>
+        <textarea id="message" name="message" required></textarea><br><br>
+
+        <button type="submit">Send Webhook</button>
+    </form>
 </body>
 </html>
