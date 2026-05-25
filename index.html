@@ -1,407 +1,818 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>⚙️ Ultimate Webhook Spammer ⚙️</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>wh-spam</title>
   <style>
     :root {
-      --bg1: #0f0f0f;
-      --bg2: #1a1a40;
-      --accent: #00ffff;
-      --accent2: #6f42c1;
-      --text: #fff;
-      --card: rgba(0,0,0,0.7);
-      --valid: #28a745;
-      --invalid: #dc3545;
+      --bg: #0d0d0d;
+      --surface: #161616;
+      --border: #2a2a2a;
+      --text: #e8e8e8;
+      --muted: #6b6b6b;
+      --accent: #5865f2;
+      --green: #3ba55c;
+      --red: #ed4245;
+      --yellow: #faa61a;
+      --input-bg: #1e1e1e;
+      --mono: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      --sans: 'Segoe UI', system-ui, sans-serif;
     }
     [data-theme="light"] {
-      --bg1: #f4f4f8;
-      --bg2: #dcdcf0;
-      --text: #111;
-      --card: rgba(255,255,255,0.8);
-      --accent: #0077cc;
-      --accent2: #6f42c1;
+      --bg: #f0f0f0;
+      --surface: #ffffff;
+      --border: #d4d4d4;
+      --text: #111111;
+      --muted: #888888;
+      --input-bg: #f8f8f8;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: var(--sans);
+      background: var(--bg);
       color: var(--text);
-      overflow-x: hidden;
-      background: radial-gradient(circle at center, var(--bg2), var(--bg1));
+      font-size: 13px;
+      min-height: 100vh;
     }
-    canvas#bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
-    h1 {
-      text-align: center;
-      margin: 20px auto;
-      font-size: 2.5rem;
-      max-width: 90%;
-      background: linear-gradient(90deg, var(--accent2), var(--accent));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: underline 2s infinite;
+    a { color: var(--accent); }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
-    @keyframes underline {
-      0%, 100% { text-decoration: underline; }
-      50% { text-decoration: none; }
-    }
-    .container {
-      width: 95%; max-width: 600px;
-      margin: 80px auto;
-      background: var(--card);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px var(--accent2);
-      backdrop-filter: blur(10px);
-    }
-    label { display: block; margin-top: 15px; font-weight: 600; }
-    input, textarea, select {
-      width: 100%; padding: 10px; margin-top: 5px;
-      border: 2px solid transparent;
-      border-radius: 6px;
-      background: rgba(50,50,70,0.5);
+    header h1 {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 600;
       color: var(--text);
-      font-size: 1rem;
-      transition: box-shadow .3s, transform .2s;
+      letter-spacing: 0;
     }
-    input:focus, textarea:focus {
-      transform: scale(1.02);
-      box-shadow: 0 0 8px var(--accent2);
-      outline: none;
-    }
-    .drop-zone, .avatar-zone {
-      position: relative;
-      border: 2px dashed transparent;
-      padding: 15px;
-      border-radius: 6px;
-      text-align: center;
-      cursor: pointer;
-      background: rgba(50,50,70,0.3);
-      margin-top: 10px;
-    }
-    .drop-zone.dragover, .avatar-zone.dragover { border-color: var(--accent2); }
-    .drop-zone img, .avatar-zone img {
-      max-width: 100%; max-height: 120px;
-      display: block; margin: 10px auto;
-      border-radius: 4px;
-    }
-    .section { margin-top: 20px; }
-    .buttons {
-      display: flex; flex-wrap: wrap;
+    header h1 span { color: var(--accent); }
+    .header-right {
+      display: flex;
+      align-items: center;
       gap: 10px;
-      justify-content: center;
-      margin-top: 20px;
     }
-    button {
-      flex: 1 1 45%; padding: 10px; font-size: 1rem;
-      border: none; border-radius: 6px;
-      cursor: pointer;
-      transition: transform .2s, box-shadow .3s;
-      background: var(--accent2);
-      color: var(--text);
-    }
-    button.start { background: var(--valid); color: #000; }
-    button.stop { background: var(--invalid); }
-    button:hover { transform: scale(1.05); box-shadow: 0 0 8px var(--accent2); }
-    @media(max-width:480px) {
-      h1 { font-size: 2rem; }
-      button { flex: 1 1 100%; }
-    }
-    #preview, #console {
-      width: 100%; margin-top: 15px;
-      padding: 10px;
-      background: rgba(30,30,40,0.7);
-      border-radius: 6px;
-      font-family: monospace;
-      max-height: 150px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-    }
-    #console { color: #00ff88; }
-    .theme-toggle {
-      position: fixed; top: 20px; right: 20px;
-      width: 40px; height: 40px;
-      border: 2px solid var(--accent2);
+    .status-dot {
+      width: 8px; height: 8px;
       border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      transition: transform .2s;
+      background: var(--muted);
+      display: inline-block;
+    }
+    .status-dot.running { background: var(--green); box-shadow: 0 0 4px var(--green); animation: pulse 1.2s infinite; }
+    .status-dot.error { background: var(--red); }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.4; } }
+    .status-label { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .theme-btn {
       background: none;
-      z-index: 1;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      font-family: var(--mono);
     }
-    .theme-toggle:hover { transform: rotate(20deg); }
-    .notice {
-      position: fixed; bottom: 20px; left: 50%;
-      transform: translateX(-50%);
-      background: var(--accent2);
+    .theme-btn:hover { border-color: var(--accent); color: var(--text); }
+    .layout {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      height: calc(100vh - 46px);
+    }
+    .sidebar {
+      overflow-y: auto;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .panel {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .section-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .field { margin-bottom: 10px; }
+    .field label {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+      font-family: var(--mono);
+    }
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      padding: 7px 9px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
       color: var(--text);
-      padding: 10px 20px;
-      border-radius: 6px;
+      font-size: 12px;
+      font-family: var(--sans);
+      outline: none;
+      resize: vertical;
+      transition: border-color .15s;
+    }
+    .field input:focus,
+    .field textarea:focus { border-color: var(--accent); }
+    .field input.ok { border-color: var(--green); }
+    .field input.fail { border-color: var(--red); }
+    .row { display: flex; gap: 8px; }
+    .row .field { flex: 1; }
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text);
+      margin-bottom: 6px;
+      cursor: pointer;
+    }
+    .checkbox-row input[type="checkbox"] {
+      accent-color: var(--accent);
+      width: 13px;
+      height: 13px;
+      cursor: pointer;
+    }
+    .drop-zone {
+      border: 1px dashed var(--border);
+      border-radius: 4px;
+      padding: 12px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+      cursor: pointer;
+      background: var(--input-bg);
+      transition: border-color .15s;
+      font-family: var(--mono);
+      position: relative;
+    }
+    .drop-zone:hover, .drop-zone.over { border-color: var(--accent); color: var(--text); }
+    .drop-zone img {
+      max-height: 80px;
+      max-width: 100%;
+      display: block;
+      margin: 6px auto 0;
+      border-radius: 3px;
+    }
+    .slider-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .slider-wrap input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .slider-val {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      min-width: 52px;
+      text-align: right;
+    }
+    .btn-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 7px 14px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 12px;
+      font-family: var(--mono);
+      cursor: pointer;
+      transition: background .12s, border-color .12s;
+      white-space: nowrap;
+    }
+    .btn:hover { background: var(--border); }
+    .btn:disabled { opacity: .4; pointer-events: none; }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn.primary:hover { filter: brightness(1.1); }
+    .btn.danger { border-color: var(--red); color: var(--red); }
+    .btn.danger:hover { background: var(--red); color: #fff; }
+    .btn.success { border-color: var(--green); color: var(--green); }
+    .btn.success:hover { background: var(--green); color: #fff; }
+    .btn.sm { padding: 4px 10px; font-size: 11px; }
+    .right-col {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .tab {
+      padding: 10px 16px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color .12s;
+      user-select: none;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-content { display: none; flex: 1; overflow: hidden; }
+    .tab-content.active { display: flex; flex-direction: column; }
+    pre#preview {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.7;
+      color: #cdd9e5;
+      background: #0d0d0d;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+    }
+    [data-theme="light"] pre#preview { background: #1e1e1e; }
+    #console-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .console-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .console-stats {
+      display: flex;
+      gap: 16px;
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+    .stat { color: var(--muted); }
+    .stat span { color: var(--text); }
+    .stat.ok span { color: var(--green); }
+    .stat.err span { color: var(--red); }
+    #log {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 14px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      line-height: 1.8;
+      background: var(--bg);
+    }
+    .log-entry { display: flex; gap: 8px; }
+    .log-ts { color: var(--muted); flex-shrink: 0; }
+    .log-msg.ok { color: var(--green); }
+    .log-msg.err { color: var(--red); }
+    .log-msg.warn { color: var(--yellow); }
+    .log-msg.info { color: var(--text); }
+    .configs-tab {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      background: var(--bg);
+    }
+    .cfg-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-bottom: 6px;
+    }
+    .cfg-name {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 260px;
+    }
+    .cfg-actions { display: flex; gap: 4px; flex-shrink: 0; }
+    .empty-state {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      padding: 24px;
+      text-align: center;
+    }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      padding: 10px 14px;
+      font-family: var(--mono);
+      font-size: 12px;
+      border-radius: 4px;
       opacity: 0;
-      transition: opacity .5s;
-      z-index: 1;
+      transform: translateY(8px);
+      transition: opacity .2s, transform .2s;
+      z-index: 999;
+      pointer-events: none;
+      max-width: 280px;
     }
-    /* New classes for validation feedback */
-    .valid {
-      border-color: var(--valid) !important;
-      box-shadow: 0 0 8px var(--valid) !important;
-    }
-    .invalid {
-      border-color: var(--invalid) !important;
-      box-shadow: 0 0 8px var(--invalid) !important;
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.err { border-left-color: var(--red); }
+    .toast.ok { border-left-color: var(--green); }
+    @media (max-width: 700px) {
+      .layout { grid-template-columns: 1fr; height: auto; }
+      .right-col { height: 400px; }
+      .sidebar { height: auto; }
     }
   </style>
 </head>
-<body data-theme="dark">
-  <canvas id="bg"></canvas>
-  <div class="theme-toggle" onclick="toggleTheme()">🌗</div>
-  <h1>Ultimate Webhook Spammer</h1>
-  <div class="container">
-    <label>Webhook URL</label>
-    <input id="webhookUrl" placeholder="https://discord.com/api/webhooks/..." />
-    <label>Avatar (URL or Drag & Drop)</label>
-    <input id="avatarUrl" placeholder="https://...png" />
-    <div id="avatarZone" class="avatar-zone">Or drag & drop avatar here</div>
-    <input type="file" id="avatarInput" accept="image/*" style="display:none" />
-
-    <label>Name (Optional)</label>
-    <input id="webhookName" placeholder="Bot Name" />
-    <label>Message</label>
-    <textarea id="message" rows="3"></textarea>
-    <label>File Attachment (Drag & Drop)</label>
-    <div id="dropZone" class="drop-zone">Drag & drop file here</div>
-    <input type="file" id="fileInput" accept="image/*" style="display:none" />
-
-    <div class="section embed-settings">
-      <h2>Embed Settings</h2>
-      <label>Embed Title</label>
-      <input id="embedTitle" />
-      <label>Embed Description</label>
-      <textarea id="embedDesc" rows="2"></textarea>
-      <label>Embed Color (hex)</label>
-      <input id="embedColor" placeholder="#00ff00" />
-      <label>Embed Image (URL or Drag & Drop)</label>
-      <input id="embedImageUrl" placeholder="https://...png" />
-      <div id="embedZone" class="drop-zone">Or drag & drop embed image here</div>
-      <input type="file" id="embedInput" accept="image/*" style="display:none" />
-    </div>
-
-    <div class="section settings">
-      <h2>Options</h2>
-      <label><input type="checkbox" id="useEmoji" checked/> Emojis</label>
-      <label><input type="checkbox" id="useNumber" checked/> Numbers</label>
-      <label><input type="checkbox" id="showTimestamp"/> Timestamp</label>
-      <label>Speed: <span id="speedValue">1000ms</span></label>
-      <input id="speed" type="range" min="100" max="3000" step="100" value="1000" />
-      <label>Emoji List</label>
-      <input id="emojiList" value="🔥,💣,⚡,🚀,🎯" />
-      <label>Retry Delay(ms)</label>
-      <input id="retryDelay" type="number" min="100" step="100" value="5000" />
-    </div>
-
-    <div class="section storage">
-      <h2>Stored Configs</h2>
-      <button onclick="saveConfig()">💾 Save</button>
-      <button onclick="loadLastConfig()">🔄 Load Last</button>
-      <div id="storageList"></div>
-    </div>
-
-    <div class="buttons">
-      <button id="startBtn" class="start">▶ Start</button>
-      <button id="stopBtn" class="stop" disabled>⏹ Stop</button>
-      <button id="checkBtn">🔍 Validate</button>
-      <button id="clearConsoleBtn">🗑️ Clear Log</button>
-      <button id="clearPreviewBtn">🗑️ Clear Preview</button>
-      <button id="clearFieldsBtn">🗑️ Clear Fields</button>
-    </div>
-
-    <div id="preview">▶ Payload Preview...</div>
-    <div id="console">▶ Console ready...</div>
+<body>
+<header>
+  <h1><span>//</span> wh-spam <span style="color:var(--muted);font-weight:400;">v2</span></h1>
+  <div class="header-right">
+    <div class="status-dot" id="statusDot"></div>
+    <span class="status-label" id="statusLabel">idle</span>
+    <button class="theme-btn" onclick="toggleTheme()">theme</button>
   </div>
-  <div id="notice" class="notice"></div>
+</header>
 
-  <script>
-    // Background particles
-    const canvas = document.getElementById('bg'), ctx = canvas.getContext('2d');
-    let w, h, particles = [];
-    class Particle {
-      constructor() { this.reset(); }
-      reset() { this.x = Math.random()*w; this.y = Math.random()*h; this.r = Math.random()*2+1; this.vx = (Math.random()-0.5)*0.5; this.vy = (Math.random()-0.5)*0.5; }
-      draw() { this.x += this.vx; this.y += this.vy;
-        if (this.x<0 || this.x>w || this.y<0 || this.y>h) this.reset();
-        ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,2*Math.PI);
-        ctx.fillStyle='rgba(255,255,255,0.05)'; ctx.fill();
+<div class="layout">
+  <div class="sidebar">
+    <div>
+      <div class="section-label">Webhook</div>
+      <div class="field">
+        <label>url</label>
+        <input id="webhookUrl" placeholder="https://discord.com/api/webhooks/..." spellcheck="false" />
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>username override</label>
+          <input id="webhookName" placeholder="optional" />
+        </div>
+        <div class="field">
+          <label>avatar url</label>
+          <input id="avatarUrl" placeholder="https://..." />
+        </div>
+      </div>
+      <div class="field">
+        <label>avatar drag & drop</label>
+        <div class="drop-zone" id="avatarZone">drop image here</div>
+        <input type="file" id="avatarInput" accept="image/*" style="display:none" />
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Message</div>
+      <div class="field">
+        <label>content</label>
+        <textarea id="message" rows="3" placeholder="message content..."></textarea>
+      </div>
+      <div class="field">
+        <label>file attachment</label>
+        <div class="drop-zone" id="dropZone">drop file here</div>
+        <input type="file" id="fileInput" style="display:none" />
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Embed</div>
+      <div class="field">
+        <label>title</label>
+        <input id="embedTitle" />
+      </div>
+      <div class="field">
+        <label>description</label>
+        <textarea id="embedDesc" rows="2"></textarea>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>color (hex)</label>
+          <input id="embedColor" placeholder="#5865f2" />
+        </div>
+        <div class="field">
+          <label>image url</label>
+          <input id="embedImageUrl" placeholder="https://..." />
+        </div>
+      </div>
+      <div class="field">
+        <label>embed image drop</label>
+        <div class="drop-zone" id="embedZone">drop image here</div>
+        <input type="file" id="embedInput" accept="image/*" style="display:none" />
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Options</div>
+      <label class="checkbox-row"><input type="checkbox" id="useEmoji" checked /> append random emoji</label>
+      <label class="checkbox-row"><input type="checkbox" id="useNumber" checked /> append random number</label>
+      <label class="checkbox-row"><input type="checkbox" id="showTimestamp" /> append timestamp</label>
+      <div class="field" style="margin-top:8px;">
+        <label>emoji list (comma separated)</label>
+        <input id="emojiList" value="🔥,💣,⚡,🚀,🎯" />
+      </div>
+      <div class="field">
+        <label>interval <span class="slider-val" id="speedValue">1000ms</span></label>
+        <div class="slider-wrap">
+          <input id="speed" type="range" min="100" max="3000" step="100" value="1000" />
+        </div>
+      </div>
+      <div class="field">
+        <label>retry delay (ms)</label>
+        <input id="retryDelay" type="number" min="100" step="100" value="5000" style="width:120px;" />
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Controls</div>
+      <div class="btn-group">
+        <button class="btn success" id="startBtn" onclick="startSpam()">▶ start</button>
+        <button class="btn danger" id="stopBtn" onclick="stopSpam()" disabled>■ stop</button>
+        <button class="btn" id="checkBtn" onclick="checkWebhook()">validate</button>
+      </div>
+      <div class="btn-group" style="margin-top:6px;">
+        <button class="btn sm" onclick="saveConfig()">save cfg</button>
+        <button class="btn sm" onclick="loadLastConfig()">load last</button>
+        <button class="btn sm" onclick="clearFields()">clear fields</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-col">
+    <div class="tabs">
+      <div class="tab active" data-tab="log">console</div>
+      <div class="tab" data-tab="preview">payload</div>
+      <div class="tab" data-tab="configs">saved configs</div>
+    </div>
+
+    <div class="tab-content active" id="tab-log">
+      <div id="console-wrap">
+        <div class="console-toolbar">
+          <div class="console-stats">
+            <div class="stat ok">sent <span id="statSent">0</span></div>
+            <div class="stat err">errors <span id="statErr">0</span></div>
+            <div class="stat">rate limited <span id="statRL">0</span></div>
+          </div>
+          <button class="btn sm" onclick="clearLog()">clear</button>
+        </div>
+        <div id="log"></div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-preview">
+      <pre id="preview">// payload will appear here</pre>
+    </div>
+
+    <div class="tab-content" id="tab-configs">
+      <div class="configs-tab" id="cfgList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let avatarFile = null, droppedFile = null, embedFile = null;
+  let intervalId = null;
+  let sent = 0, errors = 0, ratelimited = 0;
+  const SK = 'wh-spam-configs';
+
+  function toggleTheme() {
+    const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = t;
+  }
+
+  function toast(msg, type = 'info') {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast show ' + type;
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.className = 'toast', 2500);
+  }
+
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab, .tab-content').forEach(e => e.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById('tab-' + t.dataset.tab).classList.add('active');
+    });
+  });
+
+  function setupDrop(zoneId, inputId, onFile) {
+    const zone = document.getElementById(zoneId);
+    const inp = document.getElementById(inputId);
+    zone.addEventListener('click', () => inp.click());
+    inp.addEventListener('change', e => handle(e.target.files[0]));
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('over');
+      handle(e.dataTransfer.files[0]);
+    });
+    function handle(f) {
+      if (!f) return;
+      onFile(f);
+      if (f.type.startsWith('image/')) {
+        const r = new FileReader();
+        r.onload = () => zone.innerHTML = `<img src="${r.result}" /><br><span style="font-size:10px;color:var(--muted)">${f.name}</span>`;
+        r.readAsDataURL(f);
+      } else {
+        zone.textContent = f.name;
       }
     }
-    function initBg() { w = canvas.width = innerWidth; h = canvas.height = innerHeight; particles = []; for (let i = 0; i < 150; i++) particles.push(new Particle()); }
-    function animateBg() { ctx.clearRect(0,0,w,h); particles.forEach(p => p.draw()); requestAnimationFrame(animateBg); }
-    window.addEventListener('resize', initBg);
-    initBg(); animateBg();
+  }
 
-    // Theme & notice
-    function toggleTheme() { document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark'; }
-    function showNotice(msg) { const n = document.getElementById('notice'); n.textContent = msg; n.style.opacity = 1; setTimeout(() => n.style.opacity = 0, 3000); }
+  setupDrop('avatarZone', 'avatarInput', f => avatarFile = f);
+  setupDrop('dropZone', 'fileInput', f => droppedFile = f);
+  setupDrop('embedZone', 'embedInput', f => embedFile = f);
 
-    // state
-    let avatarFile = null, droppedFile = null, embedFile = null, intervalId = null, count = 0;
-    const storageKey = 'webhookConfigs';
+  document.getElementById('speed').addEventListener('input', e => {
+    document.getElementById('speedValue').textContent = e.target.value + 'ms';
+  });
 
-    // zones
-    function setupZone(zoneId, inputId, assign) {
-      const zone = document.getElementById(zoneId), inp = document.getElementById(inputId);
-      zone.addEventListener('click', () => inp.click());
-      inp.addEventListener('change', e => handle(e.target.files));
-      ['dragover','dragenter'].forEach(evt => zone.addEventListener(evt, ev => { ev.preventDefault(); zone.classList.add('dragover'); }));
-      ['dragleave','drop'].forEach(evt => zone.addEventListener(evt, ev => { ev.preventDefault(); zone.classList.remove('dragover'); if (evt === 'drop') handle(ev.dataTransfer.files); }));
-      function handle(files) { const f = files[0]; if (f && f.type.startsWith('image/')) { assign(f); const r = new FileReader(); r.onload = () => zone.innerHTML = `<img src="${r.result}"/>`; r.readAsDataURL(f); } else alert('Only images allowed'); }
-    }
-    setupZone('avatarZone','avatarInput', f => avatarFile = f);
-    setupZone('dropZone','fileInput', f => droppedFile = f);
-    setupZone('embedZone','embedInput', f => embedFile = f);
-
-    // config
-    function getConfig() {
-      return {
-        url: document.getElementById('webhookUrl').value.trim(),
-        name: document.getElementById('webhookName').value.trim(),
-        base: document.getElementById('message').value,
-        emojis: document.getElementById('useEmoji').checked,
-        numbers: document.getElementById('useNumber').checked,
-        timestamp: document.getElementById('showTimestamp').checked,
-        speed: +document.getElementById('speed').value,
-        retryDelay: +document.getElementById('retryDelay').value,
-        list: document.getElementById('emojiList').value.split(',').map(s => s.trim()).filter(Boolean),
-        embed: {
-          title: document.getElementById('embedTitle').value,
-          description: document.getElementById('embedDesc').value,
-          color: document.getElementById('embedColor').value.trim()
-        },
-        avatarUrl: document.getElementById('avatarUrl').value.trim()
-      };
-    }
-    function buildPayload(cfg) {
-      const parts = [];
-      if (cfg.emojis) parts.push(cfg.list[Math.floor(Math.random()*cfg.list.length)]);
-      if (cfg.numbers) parts.push(Math.floor(Math.random()*90000+10000));
-      if (cfg.timestamp) parts.push(new Date().toLocaleTimeString());
-      const content = cfg.base + (parts.length ? ' ' + parts.join(' ') : '');
-      const p = { content };
-      if (cfg.name) p.username = cfg.name;
-      if (avatarFile) p.avatar_url = undefined;
-      else if (cfg.avatarUrl) p.avatar_url = cfg.avatarUrl;
-      const e = cfg.embed;
-      const hasEmbed = e.title || e.description || embedFile;
-      if (hasEmbed) {
-        const obj = {};
-        if (e.title) obj.title = e.title;
-        if (e.description) obj.description = e.description;
-        if (e.color) obj.color = parseInt(e.color.replace('#',''), 16);
-        if (embedFile) obj.image = { url: 'attachment://' + embedFile.name };
-        p.embeds = [obj];
+  function getConfig() {
+    return {
+      url: document.getElementById('webhookUrl').value.trim(),
+      name: document.getElementById('webhookName').value.trim(),
+      base: document.getElementById('message').value,
+      avatarUrl: document.getElementById('avatarUrl').value.trim(),
+      emojis: document.getElementById('useEmoji').checked,
+      numbers: document.getElementById('useNumber').checked,
+      timestamp: document.getElementById('showTimestamp').checked,
+      speed: +document.getElementById('speed').value,
+      retryDelay: +document.getElementById('retryDelay').value,
+      emojiList: document.getElementById('emojiList').value.split(',').map(s => s.trim()).filter(Boolean),
+      embed: {
+        title: document.getElementById('embedTitle').value,
+        description: document.getElementById('embedDesc').value,
+        color: document.getElementById('embedColor').value.trim(),
+        imageUrl: document.getElementById('embedImageUrl').value.trim()
       }
-      preview(p);
-      return p;
-    }
-    function preview(p) { document.getElementById('preview').textContent = JSON.stringify(p,null,2); }
+    };
+  }
 
-    // spam
-    async function sendMessage() {
-      const cfg = getConfig();
-      if (!cfg.url || !cfg.base) return;
-      const payload = buildPayload(cfg);
-      const form = new FormData();
-      if (avatarFile) form.append('file', avatarFile, avatarFile.name);
-      if (embedFile) form.append('file', embedFile, embedFile.name);
-      if (droppedFile) form.append('file', droppedFile, droppedFile.name);
-      form.append('payload_json', JSON.stringify(payload));
-      try {
-        const res = await fetch(cfg.url, { method: 'POST', body: form });
-        if (res.ok || res.status === 204) { count++; log(`Sent #${count}`); }
-        else if (res.status === 429) { log(`Rate limited, retrying in ${cfg.retryDelay}ms`); stopSpam(); setTimeout(startSpam, cfg.retryDelay); }
-        else { log(`Error ${res.status}`); }
-      } catch (e) { log('Network error'); stopSpam(); }
+  function buildPayload(cfg) {
+    const extras = [];
+    if (cfg.emojis && cfg.emojiList.length) extras.push(cfg.emojiList[Math.floor(Math.random() * cfg.emojiList.length)]);
+    if (cfg.numbers) extras.push(Math.floor(Math.random() * 90000 + 10000));
+    if (cfg.timestamp) extras.push(new Date().toLocaleTimeString());
+    const content = cfg.base + (extras.length ? ' ' + extras.join(' ') : '');
+    const p = { content };
+    if (cfg.name) p.username = cfg.name;
+    if (!avatarFile && cfg.avatarUrl) p.avatar_url = cfg.avatarUrl;
+    const e = cfg.embed;
+    if (e.title || e.description || embedFile || e.imageUrl) {
+      const em = {};
+      if (e.title) em.title = e.title;
+      if (e.description) em.description = e.description;
+      if (e.color) em.color = parseInt(e.color.replace('#', ''), 16);
+      if (embedFile) em.image = { url: 'attachment://' + embedFile.name };
+      else if (e.imageUrl) em.image = { url: e.imageUrl };
+      p.embeds = [em];
     }
-    function startSpam() { if (intervalId) return; count = 0; clearConsole(); log('Spamming started'); sendMessage(); intervalId = setInterval(sendMessage, getConfig().speed); document.getElementById('startBtn').disabled = true; document.getElementById('stopBtn').disabled = false; }
-    function stopSpam() { clearInterval(intervalId); intervalId = null; log('Spamming stopped'); document.getElementById('startBtn').disabled = false; document.getElementById('stopBtn').disabled = true; }
+    document.getElementById('preview').textContent = JSON.stringify(p, null, 2);
+    return p;
+  }
 
-    // utilities
-    function log(msg) {
-      const c = document.getElementById('console'); const d = document.createElement('div'); const ts = document.createElement('span');
-      d.className = 'log-entry'; ts.className = 'timestamp'; ts.textContent = new Date().toLocaleTimeString() + ' -';
-      d.appendChild(ts); d.appendChild(document.createTextNode(' ' + msg));
-      c.appendChild(d); c.scrollTop = c.scrollHeight; showNotice(msg);
-    }
-    function clearConsole() { document.getElementById('console').innerHTML = '▶ Console cleared...'; }
-    function clearFields() {
-      ['webhookUrl','avatarUrl','webhookName','message','embedTitle','embedDesc','embedColor','embedImageUrl','retryDelay'].forEach(id => document.getElementById(id).value = '');
-      avatarFile = droppedFile = embedFile = null;
-      ['avatarZone','dropZone','embedZone'].forEach(z => document.getElementById(z).innerHTML = z.includes('avatar') ? 'Or drag & drop avatar here' : 'Drag & drop ' + (z === 'dropZone' ? 'file' : 'embed image') + ' here');
-      document.getElementById('useEmoji').checked = true;
-      document.getElementById('useNumber').checked = true;
-      document.getElementById('showTimestamp').checked = false;
-      showNotice('Fields cleared');
-    }
-
-    // VALIDATION: updated for green/red border feedback
-    function checkWebhook() {
-      const urlInput = document.getElementById('webhookUrl');
-      const url = urlInput.value.trim();
-      if (!url) {
-        showNotice('Please enter a webhook URL');
-        urlInput.classList.remove('valid','invalid');
-        return;
+  async function sendOnce() {
+    const cfg = getConfig();
+    if (!cfg.url || !cfg.base) return;
+    const payload = buildPayload(cfg);
+    const form = new FormData();
+    if (avatarFile) form.append('file', avatarFile, avatarFile.name);
+    if (embedFile) form.append('file2', embedFile, embedFile.name);
+    if (droppedFile) form.append('file3', droppedFile, droppedFile.name);
+    form.append('payload_json', JSON.stringify(payload));
+    try {
+      const res = await fetch(cfg.url, { method: 'POST', body: form });
+      if (res.ok || res.status === 204) {
+        sent++;
+        document.getElementById('statSent').textContent = sent;
+        log(`#${sent} sent`, 'ok');
+      } else if (res.status === 429) {
+        ratelimited++;
+        document.getElementById('statRL').textContent = ratelimited;
+        log(`rate limited — retrying in ${cfg.retryDelay}ms`, 'warn');
+        stopSpam();
+        setTimeout(startSpam, cfg.retryDelay);
+      } else {
+        errors++;
+        document.getElementById('statErr').textContent = errors;
+        log(`http ${res.status}`, 'err');
       }
-      urlInput.classList.remove('valid','invalid');
-      fetch(url)
-        .then(r => {
-          if (r.ok || r.status === 204) {
-            showNotice('Webhook valid');
-            urlInput.classList.add('valid');
-          } else {
-            showNotice(`Invalid: ${r.status}`);
-            urlInput.classList.add('invalid');
-          }
-        })
-        .catch(() => {
-          showNotice('Network error');
-          urlInput.classList.add('invalid');
-        });
+    } catch {
+      errors++;
+      document.getElementById('statErr').textContent = errors;
+      log('network error', 'err');
+      stopSpam();
     }
+  }
 
-    // storage
-    function loadStorageList() {
-      const list = JSON.parse(localStorage.getItem(storageKey) || '[]');
-      const c = document.getElementById('storageList'); c.innerHTML = '';
-      list.forEach((cfg, i) => {
-        const d = document.createElement('div'); d.className = 'storage-item';
-        d.innerHTML = `<span>${cfg.name||cfg.url}</span> <button onclick="applyStorage(${i})">Load</button> <button onclick="deleteStorage(${i})">Del</button>`;
-        c.appendChild(d);
-      });
-    }
-    function saveConfig() { const cfg = getConfig(); if (!cfg.url) return; const list = JSON.parse(localStorage.getItem(storageKey)||'[]'); list.push(cfg); localStorage.setItem(storageKey, JSON.stringify(list)); loadStorageList(); showNotice('Config saved'); }
-    function applyStorage(i) { const list = JSON.parse(localStorage.getItem(storageKey)||'[]'), cfg = list[i]; Object.entries(cfg).forEach(([k,v]) => {
-      if (k === 'embed') {
-        document.getElementById('embedTitle').value = v.title||'';
-        document.getElementById('embedDesc').value = v.description||'';
-        document.getElementById('embedColor').value = v.color||'';
-      } else if (document.getElementById(k)) {
-        const e = document.getElementById(k);
-        if (e.type === 'checkbox') e.checked = v;
-        else e.value = v;
+  function startSpam() {
+    if (intervalId) return;
+    const cfg = getConfig();
+    if (!cfg.url) { toast('enter a webhook url', 'err'); return; }
+    if (!cfg.base) { toast('enter a message', 'err'); return; }
+    sent = 0; errors = 0; ratelimited = 0;
+    document.getElementById('statSent').textContent = 0;
+    document.getElementById('statErr').textContent = 0;
+    document.getElementById('statRL').textContent = 0;
+    setStatus('running');
+    log('started', 'info');
+    sendOnce();
+    intervalId = setInterval(sendOnce, cfg.speed);
+    document.getElementById('startBtn').disabled = true;
+    document.getElementById('stopBtn').disabled = false;
+  }
+
+  function stopSpam() {
+    clearInterval(intervalId);
+    intervalId = null;
+    setStatus('idle');
+    log('stopped', 'info');
+    document.getElementById('startBtn').disabled = false;
+    document.getElementById('stopBtn').disabled = true;
+  }
+
+  function setStatus(s) {
+    const dot = document.getElementById('statusDot');
+    const lbl = document.getElementById('statusLabel');
+    dot.className = 'status-dot ' + (s === 'running' ? 'running' : s === 'error' ? 'error' : '');
+    lbl.textContent = s;
+  }
+
+  function log(msg, type = 'info') {
+    const wrap = document.getElementById('log');
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    const ts = document.createElement('span');
+    ts.className = 'log-ts';
+    ts.textContent = new Date().toLocaleTimeString('en-GB');
+    const m = document.createElement('span');
+    m.className = 'log-msg ' + type;
+    m.textContent = msg;
+    entry.appendChild(ts);
+    entry.appendChild(m);
+    wrap.appendChild(entry);
+    wrap.scrollTop = wrap.scrollHeight;
+  }
+
+  function clearLog() {
+    document.getElementById('log').innerHTML = '';
+    sent = 0; errors = 0; ratelimited = 0;
+    document.getElementById('statSent').textContent = 0;
+    document.getElementById('statErr').textContent = 0;
+    document.getElementById('statRL').textContent = 0;
+  }
+
+  function checkWebhook() {
+    const inp = document.getElementById('webhookUrl');
+    const url = inp.value.trim();
+    if (!url) { toast('no url', 'err'); return; }
+    inp.className = '';
+    log('validating...', 'info');
+    fetch(url).then(r => {
+      if (r.ok || r.status === 204) {
+        inp.classList.add('ok');
+        log('webhook valid', 'ok');
+        toast('valid', 'ok');
+      } else {
+        inp.classList.add('fail');
+        log(`invalid: ${r.status}`, 'err');
+        toast(`invalid: ${r.status}`, 'err');
       }
-    }); showNotice('Config loaded'); }
-    function deleteStorage(i) { const l = JSON.parse(localStorage.getItem(storageKey)||'[]'); l.splice(i,1); localStorage.setItem(storageKey, JSON.stringify(l)); loadStorageList(); showNotice('Deleted'); }
-    function loadLastConfig() { const l = JSON.parse(localStorage.getItem(storageKey)||'[]'); l.length ? applyStorage(l.length-1) : showNotice('No configs'); }
+    }).catch(() => {
+      inp.classList.add('fail');
+      log('network error during validate', 'err');
+      toast('network error', 'err');
+    });
+  }
 
-    // events
-    document.getElementById('startBtn').onclick = startSpam;
-    document.getElementById('stopBtn').onclick = stopSpam;
-    document.getElementById('checkBtn').onclick = checkWebhook;
-    document.getElementById('clearConsoleBtn').onclick = clearConsole;
-    document.getElementById('clearPreviewBtn').onclick = () => preview({});
-    document.getElementById('clearFieldsBtn').onclick = clearFields;
-    document.getElementById('speed').addEventListener('input', e => document.getElementById('speedValue').textContent = e.target.value + 'ms');
-    loadStorageList();
-  </script>
+  function clearFields() {
+    ['webhookUrl','webhookName','avatarUrl','message','embedTitle','embedDesc','embedColor','embedImageUrl'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('retryDelay').value = '5000';
+    avatarFile = droppedFile = embedFile = null;
+    document.getElementById('avatarZone').textContent = 'drop image here';
+    document.getElementById('dropZone').textContent = 'drop file here';
+    document.getElementById('embedZone').textContent = 'drop image here';
+    document.getElementById('useEmoji').checked = true;
+    document.getElementById('useNumber').checked = true;
+    document.getElementById('showTimestamp').checked = false;
+    document.getElementById('preview').textContent = '// payload will appear here';
+    toast('cleared');
+  }
+
+  function saveConfig() {
+    const cfg = getConfig();
+    if (!cfg.url) { toast('no url to save', 'err'); return; }
+    const list = JSON.parse(localStorage.getItem(SK) || '[]');
+    list.push({ ...cfg, _saved: Date.now() });
+    localStorage.setItem(SK, JSON.stringify(list));
+    renderConfigs();
+    toast('config saved', 'ok');
+  }
+
+  function loadLastConfig() {
+    const list = JSON.parse(localStorage.getItem(SK) || '[]');
+    if (!list.length) { toast('no saved configs', 'err'); return; }
+    applyConfig(list[list.length - 1]);
+    toast('loaded', 'ok');
+  }
+
+  function applyConfig(cfg) {
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+    set('webhookUrl', cfg.url);
+    set('webhookName', cfg.name);
+    set('avatarUrl', cfg.avatarUrl);
+    set('message', cfg.base);
+    set('embedTitle', cfg.embed?.title);
+    set('embedDesc', cfg.embed?.description);
+    set('embedColor', cfg.embed?.color);
+    set('embedImageUrl', cfg.embed?.imageUrl);
+    set('emojiList', cfg.emojiList?.join(','));
+    set('speed', cfg.speed);
+    set('retryDelay', cfg.retryDelay);
+    document.getElementById('speedValue').textContent = (cfg.speed || 1000) + 'ms';
+    document.getElementById('useEmoji').checked = !!cfg.emojis;
+    document.getElementById('useNumber').checked = !!cfg.numbers;
+    document.getElementById('showTimestamp').checked = !!cfg.timestamp;
+  }
+
+  function deleteConfig(i) {
+    const list = JSON.parse(localStorage.getItem(SK) || '[]');
+    list.splice(i, 1);
+    localStorage.setItem(SK, JSON.stringify(list));
+    renderConfigs();
+    toast('deleted');
+  }
+
+  function renderConfigs() {
+    const list = JSON.parse(localStorage.getItem(SK) || '[]');
+    const el = document.getElementById('cfgList');
+    if (!list.length) {
+      el.innerHTML = '<div class="empty-state">no saved configs</div>';
+      return;
+    }
+    el.innerHTML = '';
+    list.forEach((cfg, i) => {
+      const item = document.createElement('div');
+      item.className = 'cfg-item';
+      const name = document.createElement('div');
+      name.className = 'cfg-name';
+      name.textContent = cfg.name || cfg.url;
+      const actions = document.createElement('div');
+      actions.className = 'cfg-actions';
+      const load = document.createElement('button');
+      load.className = 'btn sm';
+      load.textContent = 'load';
+      load.onclick = () => { applyConfig(cfg); toast('loaded', 'ok'); };
+      const del = document.createElement('button');
+      del.className = 'btn sm danger';
+      del.textContent = 'del';
+      del.onclick = () => deleteConfig(i);
+      actions.appendChild(load);
+      actions.appendChild(del);
+      item.appendChild(name);
+      item.appendChild(actions);
+      el.appendChild(item);
+    });
+  }
+
+  renderConfigs();
+</script>
 </body>
 </html>
